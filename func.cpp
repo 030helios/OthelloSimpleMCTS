@@ -168,7 +168,7 @@ int downleft(vector<vector<int>> &board, int &col, int i, int j)
 //if this is a viable move
 int viable(vector<vector<int>> &board, int col, int i, int j)
 {
-    if(board[i][j]!=0)
+    if (board[i][j] != 0)
         return 0;
     if (!vialeft(board, col, i, j))
     {
@@ -326,7 +326,6 @@ void givelist(vector<vector<int>> &board, int col, vector<vector<int>> &ret)
             }
         }
     }
-    ret.resize(ret.size());
 }
 
 //print the board
@@ -372,12 +371,8 @@ vector<int> won(vector<vector<int>> &board)
             //no more moves
             int re = 0;
             for (int i = 0; i < 8; i++)
-            {
                 for (int j = 0; j < 8; j++)
-                {
                     re += board[i][j];
-                }
-            }
             //re is the final count of their pieces
             if (re > 0)
                 ret.push_back(1);
@@ -407,8 +402,11 @@ int randomstep(vector<vector<int>> &board, int col)
         int y = cords[ran][1];
         puthere(board, col, x, y);
     }
-    vector<int> win = won(board);
-    if (win[1] == 0)
-        return randomstep(board, -col);
-    return win[0];
+    else
+    {
+        vector<int> win = won(board);
+        if (win[1] != 0)
+            return win[0];
+    }
+    return randomstep(board, -col);
 }

@@ -146,9 +146,8 @@ void Node::explore()
             haschild = true;
             getchild();
             for (int i = 0; i < children.size(); i++)
-            {
                 children[i].play2win();
-            }
+
             update();
         }
     }

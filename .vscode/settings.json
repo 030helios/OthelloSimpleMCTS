@@ -6,6 +6,11 @@
         "thread": "cpp",
         "xlocnum": "cpp",
         "vector": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "optional": "cpp",
+        "functional": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "variant": "cpp"
     }
 }
