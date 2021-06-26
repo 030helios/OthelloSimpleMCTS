@@ -11,8 +11,8 @@
 #include <mutex>
 using namespace std;
 
-int ThinkTime = 2;
-int threadCount = 7;
+int ThinkTime;
+int threadCount;
 
 //vector of root
 vector<Node *> roots;
@@ -83,6 +83,8 @@ vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
 
 int main()
 {
+    //default 7 thread
+    threadCount = 7;
     cout<<"How much time can the computer think?(seconds)\n";
     cin>>ThinkTime;
     bool IsBlack = true;
