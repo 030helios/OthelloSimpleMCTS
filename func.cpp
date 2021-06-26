@@ -166,8 +166,10 @@ int downleft(vector<vector<int>> &board, int &col, int i, int j)
     return 0;
 }
 //if this is a viable move
-int viable(vector<vector<int>> &board, int &col, int i, int j)
+int viable(vector<vector<int>> &board, int col, int i, int j)
 {
+    if(board[i][j]!=0)
+        return 0;
     if (!vialeft(board, col, i, j))
     {
         if (!viaright(board, col, i, j))
@@ -333,25 +335,20 @@ int printboard(vector<vector<int>> &board)
     cout << "   0   1   2   3   4   5   6   7" << endl;
     for (int i = 0; i < board.size(); i++)
     {
-        cout << 'A'+i << "  ";
+        cout << char('A' + i) << "  ";
         for (int j = 0; j < board[i].size(); j++)
         {
-            if ((i == 0 || i == 7) && (j == 0 || j == 7))
-                cout << "x   ";
-            else
+            switch (board[i][j])
             {
-                switch (board[i][j])
-                {
-                case 0:
-                    cout << ".   ";
-                    break;
-                case 1:
-                    cout << "@   ";
-                    break;
-                case -1:
-                    cout << "O   ";
-                    break;
-                }
+            case 0:
+                cout << ".   ";
+                break;
+            case 1:
+                cout << "@   ";
+                break;
+            case -1:
+                cout << "O   ";
+                break;
             }
         }
         cout << endl
@@ -360,7 +357,8 @@ int printboard(vector<vector<int>> &board)
     return 0;
 }
 
-//return win + = 1 , - = -1
+//ret[0] = win color @ = 1 , O = -1
+//ret[1] = game finished or not
 vector<int> won(vector<vector<int>> &board)
 {
     vector<int> ret;

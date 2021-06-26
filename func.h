@@ -10,7 +10,7 @@ int upleft(vector<vector<int>> &board, int &col, int i, int j);
 int downright(vector<vector<int>> &board, int &col, int i, int j);
 int downleft(vector<vector<int>> &board, int &col, int i, int j);
 
-int viable(vector<vector<int>> &board, int &col, int i, int j);
+int viable(vector<vector<int>> &board, int col, int i, int j);
 
 int puthere(vector<vector<int>> &board, int col, int x, int y);
 

@@ -1,6 +1,7 @@
 #include "func.h"
 #include "node.h"
 #include <mutex>
+#include <math.h>
 #include <vector>
 using namespace std;
 
@@ -12,7 +13,6 @@ Node::Node(const Node &t)
     wins = 0;
     totalgames = 0;
     initwin = 0;
-    step = t.step;
     board = t.board;
 }
 Node::Node()
@@ -66,8 +66,6 @@ float Node::UCB(int &N)
 }
 void Node::start(vector<vector<int>> &bd, int &x, int &y, int co)
 {
-    vector<int> stepu{x, y};
-    step = stepu;
     board = bd;
     puthere(board, co, x, y);
     col = -co;
@@ -76,11 +74,10 @@ void Node::start(vector<vector<int>> &bd, int &x, int &y, int co)
 void Node::pass(vector<vector<int>> &bd, int co)
 {
     vector<int> stepu(2, 0);
-    step = stepu;
     col = co;
     board = bd;
 }
-//dumps the crap when we regenerate the search
+//removes data without removing the structure
 int Node::clean()
 {
     wins = 0;

@@ -11,15 +11,17 @@
 #include <mutex>
 using namespace std;
 
-bool newSource = true;
+int ThinkTime = 2;
 int threadCount = 7;
-//
-Node Source;
+
 //vector of root
 vector<Node *> roots;
 
-//real part
-void FiveSec(time_t timeLimit, Node *comp2)
+bool newSource = true;
+Node Source;
+
+//continue exploring until time up
+void Countdown(time_t timeLimit, Node *comp2)
 {
     comp2->clean();
     while (time(0) < timeLimit)
@@ -27,7 +29,7 @@ void FiveSec(time_t timeLimit, Node *comp2)
     return;
 }
 
-vector<int> GetStep(vector<vector<int>> &board, bool is_black)
+vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
 {
     //set the roots
     if (!newSource)
@@ -43,16 +45,16 @@ vector<int> GetStep(vector<vector<int>> &board, bool is_black)
         newSource = false;
         int col = is_black ? 1 : -1;
         Source.pass(board, col);
+        roots.clear();
         for (int i = 0; i < threadCount; i++)
-            roots[i] = &Source;
+            roots.push_back(&Source);
     }
 
-    //MCTS for 5 secs
-    time_t timeLimit = time(0) + 5;
+    time_t timeLimit = time(0) + ThinkTime;
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
-        threadvec.emplace_back(FiveSec, timeLimit, roots[i]);
+        threadvec.emplace_back(Countdown, timeLimit, roots[i]);
     //after 5 seconds
     for (int i = 0; i < threadCount; i++)
         threadvec[i].join();
@@ -70,15 +72,20 @@ vector<int> GetStep(vector<vector<int>> &board, bool is_black)
         }
     }
     //update each root
+    cout<<"Total playouts: "<<roots[0]->totalgames<<endl;
     Node *NewRoot = &roots[0]->children[ind];
     for (int i = 0; i < threadCount; i++)
         roots[i] = NewRoot;
-
-    return roots[0]->step;
+    float winrate = float(NewRoot->wins)/NewRoot->totalgames;
+    cout<<"Player winrate estimate: "<<winrate<<endl;
+    return roots[0]->board;
 }
 
 int main()
 {
+    cout<<"How much time can the computer think?(seconds)\n";
+    cin>>ThinkTime;
+    bool IsBlack = true;
     vector<vector<int>> board{{0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
@@ -87,6 +94,27 @@ int main()
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0}};
-    printboard(board);
+    while(won(board)[1]==0){
+        printboard(board);
+        cout<<endl;
+        board = GetStep(board,IsBlack);
+        printboard(board);
+        cout<<endl;
+        if(won(board)[1]){
+            break;
+        }
+        char y;
+        int x;
+        do
+        {
+            cout<<"Your turn, example: A 0"<<endl;
+            cin>>y>>x;
+        } while (!viable(board,IsBlack?-1:1,y-'A',x));
+        puthere(board,IsBlack?-1:1,y-'A',x);
+    }
+    if(won(board)[0]>0)
+        cout<<"winner: "<<"@\n";
+    else
+        cout<<"winner: "<<"O\n";
     return 0;
 }

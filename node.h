@@ -2,7 +2,7 @@
 #include <vector>
 using namespace std;
 
-float global_C = 0.6;
+#define global_C 0.6
 
 //the tree node  of MCTS
 class Node
@@ -19,7 +19,6 @@ public:
     int wins = 0;
     int totalgames = 0;
     int initwin = 0;
-    vector<int> step;
     vector<vector<int>> board;
     vector<Node> children;
 
