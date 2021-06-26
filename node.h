@@ -8,7 +8,7 @@ using namespace std;
 class Node
 {
 private:
-    mutex stats_mtx;
+    mutex mtx;
 
 public:
     int col;
@@ -23,20 +23,18 @@ public:
     Node(const Node &t);
     Node();
 
-    bool gethaschild();
-    bool getexplored();
     Node *playermove(vector<vector<int>> &target, bool &newSource);
     float UCB(int &N);
 
     void start(vector<vector<int>> &bd, int &x, int &y, int co);
     void pass(vector<vector<int>> &bd, int co);
 
-    int clean();
+    void clean();
     void getchild();
     void play2win();
 
     int randstep();
-    int update();
+    void update();
     void explore();
     int select();
     Node *getbest();

@@ -5,6 +5,7 @@
         "algorithm": "cpp",
         "thread": "cpp",
         "xlocnum": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "*.tcc": "cpp"
     }
 }

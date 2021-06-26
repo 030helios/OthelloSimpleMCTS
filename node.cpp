@@ -8,12 +8,12 @@ using namespace std;
 Node::Node(const Node &t)
 {
     col = t.col;
+    board = t.board;
     haschild = false;
     explored = false;
     wins = 0;
     totalgames = 0;
     initwin = 0;
-    board = t.board;
 }
 Node::Node()
 {
@@ -23,39 +23,21 @@ Node::Node()
     totalgames = 0;
     initwin = 0;
 }
-bool Node::gethaschild()
-{
-    std::lock_guard<std::mutex> lock(this->stats_mtx);
-    return haschild;
-}
-bool Node::getexplored()
-{
-    std::lock_guard<std::mutex> lock(this->stats_mtx);
-    return explored;
-}
 
 //returns next node
 Node *Node::playermove(vector<vector<int>> &target, bool &newSource)
 {
-    int ind = -1;
     if (!haschild)
         getchild();
     //see which child matches the input
     for (int i = 0; i < children.size(); i++)
-    {
         if (children[i].board == target)
         {
-            ind = i;
+            children.resize(i + 1);
+            return &children[i];
         }
-    }
-    //if error and target is not in children
-    if (ind == -1)
-    {
-        newSource = true;
-        return this;
-    }
-    children.resize(ind + 1);
-    return &children[ind];
+    newSource = true;
+    return this;
 }
 //return UCB
 float Node::UCB(int &N)
@@ -73,32 +55,30 @@ void Node::start(vector<vector<int>> &bd, int &x, int &y, int co)
 //input map and the color of next step
 void Node::pass(vector<vector<int>> &bd, int co)
 {
-    vector<int> stepu(2, 0);
     col = co;
     board = bd;
 }
 //removes data without removing the structure
-int Node::clean()
+void Node::clean()
 {
     wins = 0;
     totalgames = 0;
     initwin = 0;
     explored = false;
-    return 0;
 }
 //build the children vector
 void Node::getchild()
 {
-    vector<vector<int>> coords;
-    givelist(board, col, coords);
+    vector<vector<int>> moves;
+    givelist(board, col, moves);
     Node kid;
-    if (coords.size())
+    if (moves.size())
     {
-        children.reserve(coords.size());
+        children.reserve(moves.size());
         //not pass then generate children
-        for (int i = 0; i < coords.size(); i++)
+        for (int i = 0; i < moves.size(); i++)
         {
-            kid.start(board, coords[i][0], coords[i][1], col);
+            kid.start(board, moves[i][0], moves[i][1], col);
             children.push_back(kid);
         }
     }
@@ -130,7 +110,7 @@ int Node::randstep()
     return children[ran].randstep();
 }
 //update the total games and wins;
-int Node::update()
+void Node::update()
 {
     int childsize = children.size();
     wins = 0;
@@ -143,21 +123,20 @@ int Node::update()
     wins = totalgames - wins;
     wins += initwin;
     totalgames++;
-    return 0;
 }
 
 //explore this node, col of computer step
 void Node::explore()
 {
-    if (gethaschild() && getexplored())
+    if (haschild && explored)
     {
         children[select()].explore();
-        std::lock_guard<std::mutex> lock(this->stats_mtx);
+        std::lock_guard<std::mutex> lock(this->mtx);
         update();
         return;
     }
-    std::lock_guard<std::mutex> lock(this->stats_mtx);
-    if (!gethaschild())
+    std::lock_guard<std::mutex> lock(this->mtx);
+    if (!haschild)
     {
         //first time generating children
         if (won(board)[1])
@@ -173,7 +152,7 @@ void Node::explore()
             update();
         }
     }
-    else if (!getexplored())
+    else if (!explored)
     {
         //second time
         explored = true;
