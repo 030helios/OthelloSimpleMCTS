@@ -8,8 +8,8 @@ using namespace std;
 Node::Node(const Node &t)
 {
     col = t.col;
-    haschild = 0;
-    explored = 0;
+    haschild = false;
+    explored = false;
     wins = 0;
     totalgames = 0;
     initwin = 0;
@@ -17,20 +17,20 @@ Node::Node(const Node &t)
 }
 Node::Node()
 {
-    haschild = 0;
-    explored = 0;
+    haschild = false;
+    explored = false;
     wins = 0;
     totalgames = 0;
     initwin = 0;
 }
-int Node::gethaschild()
+bool Node::gethaschild()
 {
-    std::lock_guard<std::mutex> lock5(this->child_mtx);
+    std::lock_guard<std::mutex> lock(this->stats_mtx);
     return haschild;
 }
-int Node::getexplored()
+bool Node::getexplored()
 {
-    std::lock_guard<std::mutex> lock6(this->explore_mtx);
+    std::lock_guard<std::mutex> lock(this->stats_mtx);
     return explored;
 }
 
@@ -83,7 +83,7 @@ int Node::clean()
     wins = 0;
     totalgames = 0;
     initwin = 0;
-    explored = 0;
+    explored = false;
     return 0;
 }
 //build the children vector
@@ -91,21 +91,21 @@ void Node::getchild()
 {
     vector<vector<int>> coords;
     givelist(board, col, coords);
-    children.reserve(coords.size() + 1);
     Node kid;
-    if (coords.size() == 0)
+    if (coords.size())
     {
-        kid.pass(board, -col);
-        children.push_back(kid);
-    }
-    else
-    {
+        children.reserve(coords.size());
         //not pass then generate children
         for (int i = 0; i < coords.size(); i++)
         {
             kid.start(board, coords[i][0], coords[i][1], col);
             children.push_back(kid);
         }
+    }
+    else
+    {
+        kid.pass(board, -col);
+        children.push_back(kid);
     }
 }
 //initiate process
@@ -152,22 +152,19 @@ void Node::explore()
     if (gethaschild() && getexplored())
     {
         children[select()].explore();
-        std::lock_guard<std::mutex> lock1(this->stats_mtx);
+        std::lock_guard<std::mutex> lock(this->stats_mtx);
         update();
         return;
     }
-    std::lock_guard<std::mutex> lock2(this->stats_mtx);
+    std::lock_guard<std::mutex> lock(this->stats_mtx);
     if (!gethaschild())
     {
         //first time generating children
         if (won(board)[1])
-        {
             play2win();
-        }
         else
         {
-            std::lock_guard<std::mutex> lock3(this->child_mtx);
-            haschild = 1;
+            haschild = true;
             getchild();
             for (int i = 0; i < children.size(); i++)
             {
@@ -179,8 +176,7 @@ void Node::explore()
     else if (!getexplored())
     {
         //second time
-        std::lock_guard<std::mutex> lock4(this->explore_mtx);
-        explored = 1;
+        explored = true;
         for (int i = 0; i < children.size(); i++)
         {
             children[i].clean();
@@ -206,6 +202,8 @@ int Node::select()
             ucbmax = ucb;
             imax = i;
         }
+        else if (ucb == ucbmax && rand() % children.size() == 0)
+            imax = i;
     }
     return imax;
 }

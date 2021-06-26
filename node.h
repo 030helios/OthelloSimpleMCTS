@@ -9,13 +9,11 @@ class Node
 {
 private:
     mutex stats_mtx;
-    mutex child_mtx;
-    mutex explore_mtx;
 
 public:
     int col;
-    int haschild = 0;
-    int explored = 0;
+    bool haschild = false;
+    bool explored = false;
     int wins = 0;
     int totalgames = 0;
     int initwin = 0;
@@ -25,8 +23,8 @@ public:
     Node(const Node &t);
     Node();
 
-    int gethaschild();
-    int getexplored();
+    bool gethaschild();
+    bool getexplored();
     Node *playermove(vector<vector<int>> &target, bool &newSource);
     float UCB(int &N);
 
