@@ -71,10 +71,7 @@ int main()
         if (IsBlack)
             board = GetStep(board, IsBlack);
         else
-        {
-            cout << root->children.size() << endl;
             board = root->children[rand() % root->children.size()].board;
-        }
         IsBlack = !IsBlack;
         printboard(board);
         cout << endl;

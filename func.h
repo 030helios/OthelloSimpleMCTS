@@ -19,5 +19,3 @@ void legalMoves(vector<vector<int>> &board, int col, vector<vector<int>> &ret);
 void printboard(vector<vector<int>> &board);
 
 vector<int> won(vector<vector<int>> &board);
-
-int playout(vector<vector<int>> board, int col);

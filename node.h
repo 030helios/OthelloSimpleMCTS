@@ -11,7 +11,6 @@ class Node
 private:
     mutex mtx;
     mutex child_mtx;
-
 public:
     int col;
     bool haschild = false;
@@ -19,18 +18,19 @@ public:
     int wins = 0;
     int totalgames = 0;
     vector<vector<int>> board;
+    vector<vector<int>> moves;
     deque<Node> children;
 
+    Node();
     Node(const Node &t);
     Node(vector<vector<int>> &bd, int co);
     Node(vector<vector<int>> &bd, int &x, int &y, int co);
-    Node();
-    
+
     Node *playermove(vector<vector<int>> &target);
     float UCB(int &N);
 
     void clean();
-    void getchild();
+    void getmoves();
 
     int explore();
     int select();

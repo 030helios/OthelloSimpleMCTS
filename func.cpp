@@ -300,26 +300,3 @@ vector<int> won(vector<vector<int>> &board)
     }
     return ret;
 }
-//random choices return win or not, col of next step
-int playout(vector<vector<int>> board, int col)
-{
-    vector<vector<int>> moves;
-    while (1)
-    {
-        moves.clear();
-        legalMoves(board, col, moves);
-        //if not pass
-        if (moves.size())
-        {
-            int ran = rand() % moves.size();
-            playMoveAssumeLegal(board, col, moves[ran][0], moves[ran][1]);
-        }
-        else
-        {
-            vector<int> win = won(board);
-            if (win[1] != 0)
-                return win[0];
-        }
-        col = -col;
-    }
-}
