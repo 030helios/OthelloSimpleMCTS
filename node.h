@@ -3,7 +3,7 @@
 #include <deque>
 using namespace std;
 
-#define global_C 0.6
+#define global_C 0.5
 
 //the tree node  of MCTS
 class Node

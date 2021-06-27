@@ -29,7 +29,7 @@ vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
 {
     //set the root
     root = root->playermove(board);
-    //root->clean();
+    root->clean();
 
     time_t timeLimit = time(0) + ThinkTime;
     //initialize thread
@@ -45,13 +45,15 @@ vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
     float winrate = float(root->wins) / root->totalgames;
     cout << "Player wins: " << root->wins << endl;
     cout << "Player winrate estimate: " << winrate << endl;
+    if (winrate == 0)
+        ThinkTime = 0;
     return root->board;
 }
 
 int main()
 {
-    //default 7 thread
-    threadCount = 7;
+    //default 8 thread
+    threadCount = 8;
     cout << "How much time can the computer think?(seconds)\n";
     cin >> ThinkTime;
     bool IsBlack = true;
@@ -80,5 +82,7 @@ int main()
         cout << "winner: @\n";
     else
         cout << "winner: O\n";
+
+    cout << "gameover: " << root->gameover << endl;
     return 0;
 }

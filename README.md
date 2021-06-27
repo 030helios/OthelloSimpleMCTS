@@ -1,4 +1,7 @@
 # OthelloSimpleMCTS
-Simple multithread MCTS Othello bot
+Simple multithread MCTS Othello bot. Aim for performance with simplicity in mind.
 
-The aim is to get great performance while being simple. Speeds up playout by preserving search tree structure throughout the game.
+Maintains search tree structure throughout the game.
+Automatically minmax last game nodes.
+
+Gobbles RAM like a boss.
