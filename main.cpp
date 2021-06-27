@@ -72,12 +72,12 @@ vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
         }
     }
     //update each root
-    cout<<"Total playouts: "<<roots[0]->totalgames<<endl;
+    cout << "Total playouts: " << roots[0]->totalgames << endl;
     Node *NewRoot = &roots[0]->children[ind];
     for (int i = 0; i < threadCount; i++)
         roots[i] = NewRoot;
-    float winrate = float(NewRoot->wins)/NewRoot->totalgames;
-    cout<<"Player winrate estimate: "<<winrate<<endl;
+    float winrate = float(NewRoot->wins) / NewRoot->totalgames;
+    cout << "Player winrate estimate: " << winrate << endl;
     return roots[0]->board;
 }
 
@@ -85,38 +85,51 @@ int main()
 {
     //default 7 thread
     threadCount = 7;
-    cout<<"How much time can the computer think?(seconds)\n";
-    cin>>ThinkTime;
+    cout << "How much time can the computer think?(seconds)\n";
+    cin >> ThinkTime;
     bool IsBlack = true;
     vector<vector<int>> board{{0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 1,-1, 0, 0, 0},
-                              {0, 0, 0,-1, 1, 0, 0, 0},
+                              {0, 0, 0, 1, -1, 0, 0, 0},
+                              {0, 0, 0, -1, 1, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0}};
-    while(won(board)[1]==0){
+    while (won(board)[1] == 0)
+    {
         printboard(board);
-        cout<<endl;
-        board = GetStep(board,IsBlack);
+        cout << endl;
+        board = GetStep(board, IsBlack);
         printboard(board);
-        cout<<endl;
-        if(won(board)[1]){
+        cout << endl;
+        if (won(board)[1])
+        {
             break;
         }
         char y;
         int x;
         do
         {
+            /*
             cout<<"Your turn, example: A 0"<<endl;
             cin>>y>>x;
-        } while (!viable(board,IsBlack?-1:1,y-'A',x));
-        puthere(board,IsBlack?-1:1,y-'A',x);
+            */
+            //bug! not handling player pass
+            int col = IsBlack ? -1 : 1;
+            vector<vector<int>> cords;
+            givelist(board, col, cords);
+            int ran = rand() % cords.size();
+            y = 'A' + cords[ran][0];
+            x = cords[ran][1];
+        } while (!viable(board, IsBlack ? -1 : 1, y - 'A', x));
+        puthere(board, IsBlack ? -1 : 1, y - 'A', x);
     }
-    if(won(board)[0]>0)
-        cout<<"winner: "<<"@\n";
+    if (won(board)[0] > 0)
+        cout << "winner: "
+             << "@\n";
     else
-        cout<<"winner: "<<"O\n";
+        cout << "winner: "
+             << "O\n";
     return 0;
 }
