@@ -5,163 +5,105 @@
 #include <vector>
 using namespace std;
 
+Node::Node() {}
 Node::Node(const Node &t)
 {
     col = t.col;
     board = t.board;
-    haschild = false;
-    explored = false;
-    wins = 0;
-    totalgames = 0;
-    initwin = 0;
 }
-Node::Node()
+Node::Node(vector<vector<int>> &bd, int &x, int &y, int co)
 {
-    haschild = false;
-    explored = false;
-    wins = 0;
-    totalgames = 0;
-    initwin = 0;
+    board = bd;
+    playMoveAssumeLegal(board, co, x, y);
+    col = -co;
+}
+//input map and the color of next step
+Node::Node(vector<vector<int>> &bd, int co)
+{
+    col = co;
+    board = bd;
 }
 
-//returns next node
-Node *Node::playermove(vector<vector<int>> &target, bool &newSource)
+//returns child that matches the input
+Node *Node::playermove(vector<vector<int>> &target)
 {
-    if (!haschild)
-        getchild();
-    //see which child matches the input
-    for (int i = 0; i < children.size(); i++)
-        if (children[i].board == target)
-        {
-            children.resize(i + 1);
-            return &children[i];
-        }
-    newSource = true;
+    if (haschild)
+    {
+        while (children[0].board != target)
+            children.pop_front();
+        children.resize(1);
+        return &children[0];
+    }
     return this;
 }
 //return UCB
 float Node::UCB(int &N)
 {
-    float a = global_C * sqrt((log(N)) / ((float)totalgames));
-    a += ((float)(totalgames - wins) / (totalgames));
-    return a;
-}
-void Node::start(vector<vector<int>> &bd, int &x, int &y, int co)
-{
-    board = bd;
-    puthere(board, co, x, y);
-    col = -co;
-}
-//input map and the color of next step
-void Node::pass(vector<vector<int>> &bd, int co)
-{
-    col = co;
-    board = bd;
+    if (gameover == col)
+        return -INFINITY;
+    else if (gameover == -col)
+        return INFINITY;
+    if (totalgames)
+    {
+        float a = global_C * sqrt(log(N) / (float)totalgames);
+        a += ((float)(totalgames - wins) / totalgames);
+        return a;
+    }
+    return INFINITY;
 }
 //removes data without removing the structure
 void Node::clean()
 {
     wins = 0;
     totalgames = 0;
-    initwin = 0;
-    explored = false;
+    int childsize = children.size();
+    for (int i = 0; i < childsize; i++)
+        children[i].clean();
 }
 //build the children vector
 void Node::getchild()
 {
     vector<vector<int>> moves;
-    givelist(board, col, moves);
-    Node kid;
+    legalMoves(board, col, moves);
     if (moves.size())
     {
-        children.reserve(moves.size());
         //not pass then generate children
         for (int i = 0; i < moves.size(); i++)
         {
-            kid.start(board, moves[i][0], moves[i][1], col);
+            Node kid(board, moves[i][0], moves[i][1], col);
             children.push_back(kid);
         }
     }
     else
     {
-        kid.pass(board, -col);
+        vector<int> win = won(board);
+        if (win[1])
+        {
+            gameover = win[0];
+            return;
+        }
+        Node kid(board, -col);
         children.push_back(kid);
     }
+    haschild = true;
 }
-//initiate process
-void Node::play2win()
-{
-    totalgames += 1;
-    wins += (randstep() == col);
-    if (totalgames == 1)
-        initwin = wins;
-}
-//random choices return win or not, col of next step
-int Node::randstep()
-{
-    //if reach an end
-    if (children.size() == 0)
-    {
-        vector<vector<int>> bd = board;
-        return randomstep(bd, col);
-    }
-    //if there's children
-    int ran = rand() % children.size();
-    return children[ran].randstep();
-}
-//update the total games and wins;
-void Node::update()
-{
-    int childsize = children.size();
-    wins = 0;
-    totalgames = 0;
-    for (int i = 0; i < childsize; i++)
-    {
-        totalgames += children[i].totalgames;
-        wins += children[i].wins;
-    }
-    wins = totalgames - wins;
-    wins += initwin;
-    totalgames++;
-}
-
 //explore this node, col of computer step
-void Node::explore()
+int Node::explore()
 {
-    if (haschild && explored)
+    int ret = -2;
     {
-        children[select()].explore();
-        std::lock_guard<std::mutex> lock(this->mtx);
-        update();
-        return;
-    }
-    std::lock_guard<std::mutex> lock(this->mtx);
-    if (!haschild)
-    {
-        //first time generating children
-        if (won(board)[1])
-            play2win();
-        else
-        {
-            haschild = true;
+        std::lock_guard<std::mutex> lock(this->child_mtx);
+        if (haschild)
+            ret = children[select()].explore();
+        else if (gameover == -2)
             getchild();
-            for (int i = 0; i < children.size(); i++)
-                children[i].play2win();
-
-            update();
-        }
     }
-    else if (!explored)
-    {
-        //second time
-        explored = true;
-        for (int i = 0; i < children.size(); i++)
-        {
-            children[i].clean();
-            children[i].play2win();
-        }
-        update();
-    }
+    if (ret == -2)
+        ret = playout(board, col);
+    std::lock_guard<std::mutex> lock(this->mtx);
+    totalgames++;
+    wins += (ret == col);
+    return ret;
 }
 //return greatest UCB child number
 int Node::select()
@@ -202,6 +144,8 @@ Node *Node::getbest()
             imax = i;
         }
     }
-    children.resize(imax + 1);
-    return &children[imax];
+    for (int i = 0; i < imax; i++)
+        children.pop_front();
+    children.resize(1);
+    return &children[0];
 }

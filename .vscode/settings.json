@@ -11,6 +11,9 @@
         "functional": "cpp",
         "istream": "cpp",
         "ostream": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "cstdlib": "cpp",
+        "random": "cpp"
     }
 }

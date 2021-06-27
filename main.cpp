@@ -14,16 +14,12 @@ using namespace std;
 int ThinkTime;
 int threadCount;
 
-//vector of root
-vector<Node *> roots;
-
-bool newSource = true;
 Node Source;
+Node *root;
 
 //continue exploring until time up
 void Countdown(time_t timeLimit, Node *comp2)
 {
-    comp2->clean();
     while (time(0) < timeLimit)
         comp2->explore();
     return;
@@ -31,54 +27,25 @@ void Countdown(time_t timeLimit, Node *comp2)
 
 vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
 {
-    //set the roots
-    if (!newSource)
-    {
-        Node *NewRoot = roots[0]->playermove(board, newSource);
-        //get the new board
-        for (int i = 0; i < threadCount; i++)
-            roots[i] = NewRoot;
-    }
-    //first time or error, reset Source
-    if (newSource)
-    {
-        newSource = false;
-        int col = is_black ? 1 : -1;
-        Source.pass(board, col);
-        roots.clear();
-        for (int i = 0; i < threadCount; i++)
-            roots.push_back(&Source);
-    }
+    //set the root
+    root = root->playermove(board);
+    //root->clean();
 
     time_t timeLimit = time(0) + ThinkTime;
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
-        threadvec.emplace_back(Countdown, timeLimit, roots[i]);
+        threadvec.emplace_back(Countdown, timeLimit, root);
     //after 5 seconds
     for (int i = 0; i < threadCount; i++)
         threadvec[i].join();
 
-    //find the best child
-    int ind = 0;
-    int childsize = roots[0]->children.size();
-    int greatest_child_total = 0;
-    for (int i = 0; i < childsize; i++)
-    {
-        if (greatest_child_total < roots[0]->children[i].totalgames)
-        {
-            ind = i;
-            greatest_child_total = roots[0]->children[i].totalgames;
-        }
-    }
-    //update each root
-    cout << "Total playouts: " << roots[0]->totalgames << endl;
-    Node *NewRoot = &roots[0]->children[ind];
-    for (int i = 0; i < threadCount; i++)
-        roots[i] = NewRoot;
-    float winrate = float(NewRoot->wins) / NewRoot->totalgames;
+    cout << "Total playouts: " << root->totalgames << endl;
+    root = root->getbest();
+    float winrate = float(root->wins) / root->totalgames;
+    cout << "Player wins: " << root->wins << endl;
     cout << "Player winrate estimate: " << winrate << endl;
-    return roots[0]->board;
+    return root->board;
 }
 
 int main()
@@ -96,40 +63,25 @@ int main()
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0}};
+    Source.board = board;
+    Source.col = IsBlack ? 1 : -1;
+    root = &Source;
     while (won(board)[1] == 0)
     {
-        printboard(board);
-        cout << endl;
-        board = GetStep(board, IsBlack);
-        printboard(board);
-        cout << endl;
-        if (won(board)[1])
+        if (IsBlack)
+            board = GetStep(board, IsBlack);
+        else
         {
-            break;
+            cout << root->children.size() << endl;
+            board = root->children[rand() % root->children.size()].board;
         }
-        char y;
-        int x;
-        do
-        {
-            /*
-            cout<<"Your turn, example: A 0"<<endl;
-            cin>>y>>x;
-            */
-            //bug! not handling player pass
-            int col = IsBlack ? -1 : 1;
-            vector<vector<int>> cords;
-            givelist(board, col, cords);
-            int ran = rand() % cords.size();
-            y = 'A' + cords[ran][0];
-            x = cords[ran][1];
-        } while (!viable(board, IsBlack ? -1 : 1, y - 'A', x));
-        puthere(board, IsBlack ? -1 : 1, y - 'A', x);
+        IsBlack = !IsBlack;
+        printboard(board);
+        cout << endl;
     }
     if (won(board)[0] > 0)
-        cout << "winner: "
-             << "@\n";
+        cout << "winner: @\n";
     else
-        cout << "winner: "
-             << "O\n";
+        cout << "winner: O\n";
     return 0;
 }

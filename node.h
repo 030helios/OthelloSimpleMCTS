@@ -1,5 +1,6 @@
 #include <mutex>
 #include <vector>
+#include <deque>
 using namespace std;
 
 #define global_C 0.6
@@ -9,33 +10,29 @@ class Node
 {
 private:
     mutex mtx;
+    mutex child_mtx;
 
 public:
     int col;
     bool haschild = false;
-    bool explored = false;
+    int gameover = -2;
     int wins = 0;
     int totalgames = 0;
-    int initwin = 0;
     vector<vector<int>> board;
-    vector<Node> children;
+    deque<Node> children;
 
     Node(const Node &t);
+    Node(vector<vector<int>> &bd, int co);
+    Node(vector<vector<int>> &bd, int &x, int &y, int co);
     Node();
-
-    Node *playermove(vector<vector<int>> &target, bool &newSource);
+    
+    Node *playermove(vector<vector<int>> &target);
     float UCB(int &N);
-
-    void start(vector<vector<int>> &bd, int &x, int &y, int co);
-    void pass(vector<vector<int>> &bd, int co);
 
     void clean();
     void getchild();
-    void play2win();
 
-    int randstep();
-    void update();
-    void explore();
+    int explore();
     int select();
     Node *getbest();
 };
