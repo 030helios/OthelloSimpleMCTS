@@ -1,31 +1,21 @@
 #include "func.h"
 #include "node.h"
-#include <algorithm>
-#include <stdlib.h>
-#include <iostream>
 #include <time.h>
 #include <math.h>
-#include <vector>
 #include <random>
 #include <thread>
-#include <mutex>
+#include <stdlib.h>
+#include <iostream>
 using namespace std;
 
-int ThinkTime;
-int threadCount;
-
-Node Source;
-Node *root;
-
 //continue exploring until time up
-void Countdown(time_t timeLimit, Node *comp2)
+void Countdown(time_t timeLimit, Node *root)
 {
     while (time(0) < timeLimit)
-        comp2->explore();
+        root->explore();
     return;
 }
-
-array<array<int, 8>, 8> GetStep(array<array<int, 8>, 8> &board, bool is_black)
+array<array<int, 8>, 8> GetStep(array<array<int, 8>, 8> board, int &ThinkTime, int threadCount, Node *&root)
 {
     //set the root
     root = root->playermove(board);
@@ -52,37 +42,32 @@ array<array<int, 8>, 8> GetStep(array<array<int, 8>, 8> &board, bool is_black)
 
 int main()
 {
-    //default 8 thread
-    threadCount = 8;
+    int timeLimit;
     cout << "How much time can the computer think?(seconds)\n";
-    cin >> ThinkTime;
-    bool IsBlack = true;
-    array<array<int, 8>, 8> board = {{{0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 1, -1, 0, 0, 0},
-                                      {0, 0, 0, -1, 1, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0},
-                                      {0, 0, 0, 0, 0, 0, 0, 0}}};
-    Source.board = board;
-    Source.col = IsBlack ? 1 : -1;
-    root = &Source;
+    cin >> timeLimit;
+    //black
+    int computerColor = 1;
+    array<array<int, 8>, 8> board{{0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 1, -1, 0, 0, 0,
+                                   0, 0, 0, -1, 1, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0}};
+    Node Source(board, computerColor);
+    Node *root = &Source;
     while (won(board)[1] == 0)
     {
-        if (IsBlack)
-            board = GetStep(board, IsBlack);
-        else
-            board = root->children[rand() % root->children.size()].board;
-        IsBlack = !IsBlack;
+        //default 8 thread
+        board = GetStep(board, timeLimit, 8, root);
         printboard(board);
-        cout << endl;
+        board = root->children[rand() % root->children.size()].board;
+        printboard(board);
     }
-    if (won(board)[0] > 0)
-        cout << "winner: @\n";
+    if (won(board)[0] == 0)
+        cout << "draw\n";
     else
-        cout << "winner: O\n";
-
-    cout << "gameover: " << root->gameover << endl;
+        cout << "winner: " << (won(board)[0] < 0) ? "O\n" : "@\n";
     return 0;
 }
