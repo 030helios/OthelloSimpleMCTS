@@ -15,7 +15,7 @@ void Countdown(time_t timeLimit, Node *root)
         root->explore();
     return;
 }
-array<array<int8_t, 8>, 8> GetStep(array<array<int8_t, 8>, 8> board, int &ThinkTime, int threadCount, Node *&root)
+array<int8_t, 64> GetStep(array<int8_t, 64> board, int &ThinkTime, int threadCount, Node *&root)
 {
     //set the root
     root = root->playermove(board);
@@ -47,14 +47,14 @@ int main()
     cin >> timeLimit;
     //black
     int computerColor = 1;
-    array<array<int8_t, 8>, 8> board{{0, 0, 0, 0, 0, 0, 0, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                   0, 0, 0, 1, -1, 0, 0, 0,
-                                   0, 0, 0, -1, 1, 0, 0, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0,
-                                   0, 0, 0, 0, 0, 0, 0, 0}};
+    array<int8_t, 64> board{{0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 1, -1, 0, 0, 0,
+                          0, 0, 0, -1, 1, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0,
+                          0, 0, 0, 0, 0, 0, 0, 0}};
     Node Source(board, computerColor);
     Node *root = &Source;
     while (won(board)[1] == 0)
@@ -65,9 +65,11 @@ int main()
         board = root->children[rand() % root->children.size()].board;
         printboard(board);
     }
-    if (won(board)[0] == 0)
-        cout << "draw\n";
+    if (won(board)[0] < 0)
+        cout << "winner: 0\n";
+    else if (won(board)[0] > 0)
+        cout << "winner: @\n";
     else
-        cout << "winner: " << (won(board)[0] < 0) ? "O\n" : "@\n";
+        cout << "draw\n";
     return 0;
 }

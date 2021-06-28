@@ -12,20 +12,20 @@ Node::Node(const Node &t)
     board = t.board;
 }
 //init as pass
-Node::Node(array<array<int8_t, 8>, 8> &bd, int co)
+Node::Node(array<int8_t, 64> &bd, int8_t co)
 {
     col = co;
     board = bd;
 }
 //init with move to generate child node
-Node::Node(array<array<int8_t, 8>, 8> &bd, int8_t &x, int8_t &y, int co)
+Node::Node(array<int8_t, 64> &bd, int8_t &x, int8_t &y, int8_t co)
 {
     board = bd;
     playMoveAssumeLegal(board, co, x, y);
     col = -co;
 }
 //returns child that matches the input
-Node *Node::playermove(array<array<int8_t, 8>, 8> &target)
+Node *Node::playermove(array<int8_t, 64> &target)
 {
     if (haschild == 0)
         return this;
@@ -37,7 +37,7 @@ Node *Node::playermove(array<array<int8_t, 8>, 8> &target)
 //return UCB
 float Node::UCB(int &N)
 {
-    if (gameover != -2)
+    if (gameover == 1 || gameover == -1)
         return -INFINITY * col * gameover;
     if (totalgames)
     {
@@ -72,10 +72,9 @@ void Node::getmoves()
     else
         random_shuffle(moves.begin(), moves.begin() + haschild - 1);
 }
-int Node::explore()
+int8_t Node::explore()
 {
-    int index;
-    bool newmove = false;
+    int8_t index;
     {
         std::lock_guard<std::mutex> lock(child_mtx);
         if (haschild == 0)
@@ -88,7 +87,6 @@ int Node::explore()
             children.push_back(kid);
             if (haschild == 0)
                 haschild--;
-            newmove = true;
         }
         else
         {
@@ -105,25 +103,21 @@ int Node::explore()
     }
     else
     {
-        int outcome = children[index].explore();
+        int8_t outcome = children[index].explore();
         std::lock_guard<std::mutex> lock(mtx);
-        if (!newmove)
-            gameover = children[index].gameover;
-        else if (children[index].gameover == col)
-            gameover = col;
         totalgames++;
         wins += (outcome == col);
         return outcome;
     }
 }
 //return greatest UCB child number
-int Node::select()
+int8_t Node::select()
 {
     float ucbmax = 0;
     float ucb;
-    int childsize = children.size();
-    int imax = childsize - 1;
-    for (int i = 0; i < childsize; i++)
+    int8_t childsize = children.size();
+    int8_t imax = childsize - 1;
+    for (int8_t i = 0; i < childsize; i++)
     {
         ucb = children[i].UCB(totalgames);
         if (ucb > ucbmax)
@@ -137,6 +131,10 @@ int Node::select()
             imax = i;
         }
     }
+    if (ucbmax == INFINITY)
+        gameover = col;
+    else if (ucbmax == -INFINITY)
+        gameover = -col;
     return imax;
 }
 //return best board
