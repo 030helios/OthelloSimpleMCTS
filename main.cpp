@@ -15,7 +15,7 @@ void Countdown(time_t timeLimit, Node *root)
         root->explore();
     return;
 }
-array<array<int, 8>, 8> GetStep(array<array<int, 8>, 8> board, int &ThinkTime, int threadCount, Node *&root)
+array<array<int8_t, 8>, 8> GetStep(array<array<int8_t, 8>, 8> board, int &ThinkTime, int threadCount, Node *&root)
 {
     //set the root
     root = root->playermove(board);
@@ -47,7 +47,7 @@ int main()
     cin >> timeLimit;
     //black
     int computerColor = 1;
-    array<array<int, 8>, 8> board{{0, 0, 0, 0, 0, 0, 0, 0,
+    array<array<int8_t, 8>, 8> board{{0, 0, 0, 0, 0, 0, 0, 0,
                                    0, 0, 0, 0, 0, 0, 0, 0,
                                    0, 0, 0, 0, 0, 0, 0, 0,
                                    0, 0, 0, 1, -1, 0, 0, 0,

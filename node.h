@@ -14,21 +14,21 @@ private:
     mutex child_mtx;
 
 public:
-    int col;
-    int haschild = 0;
-    int gameover = -2;
+    int8_t col;
+    int8_t haschild = 0;
+    int8_t gameover = -2;
     int wins = 0;
     int totalgames = 0;
-    array<array<int, 8>, 8> board;
-    array<pair<int, int>, 24> moves;
+    array<array<int8_t, 8>, 8> board;
+    array<pair<int8_t, int8_t>, 25> moves;
     deque<Node> children;
 
     Node();
     Node(const Node &t);
-    Node(array<array<int, 8>, 8> &bd, int co);
-    Node(array<array<int, 8>, 8> &bd, int &x, int &y, int co);
+    Node(array<array<int8_t, 8>, 8> &bd, int co);
+    Node(array<array<int8_t, 8>, 8> &bd, int8_t &x, int8_t &y, int co);
 
-    Node *playermove(array<array<int, 8>, 8> &target);
+    Node *playermove(array<array<int8_t, 8>, 8> &target);
     float UCB(int &N);
 
     void clean();

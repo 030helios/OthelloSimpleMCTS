@@ -12,20 +12,20 @@ Node::Node(const Node &t)
     board = t.board;
 }
 //init as pass
-Node::Node(array<array<int, 8>, 8> &bd, int co)
+Node::Node(array<array<int8_t, 8>, 8> &bd, int co)
 {
     col = co;
     board = bd;
 }
 //init with move to generate child node
-Node::Node(array<array<int, 8>, 8> &bd, int &x, int &y, int co)
+Node::Node(array<array<int8_t, 8>, 8> &bd, int8_t &x, int8_t &y, int co)
 {
     board = bd;
     playMoveAssumeLegal(board, co, x, y);
     col = -co;
 }
 //returns child that matches the input
-Node *Node::playermove(array<array<int, 8>, 8> &target)
+Node *Node::playermove(array<array<int8_t, 8>, 8> &target)
 {
     if (haschild == 0)
         return this;
