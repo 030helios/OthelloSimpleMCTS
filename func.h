@@ -1,21 +1,22 @@
+#include <array>
 #include <vector>
 using namespace std;
 
-int vialeft(vector<vector<int>> &board, int col, int i, int j);
-int viaright(vector<vector<int>> &board, int col, int i, int j);
-int viaup(vector<vector<int>> &board, int col, int i, int j);
-int viadown(vector<vector<int>> &board, int col, int i, int j);
-int upright(vector<vector<int>> &board, int col, int i, int j);
-int upleft(vector<vector<int>> &board, int &col, int i, int j);
-int downright(vector<vector<int>> &board, int &col, int i, int j);
-int downleft(vector<vector<int>> &board, int &col, int i, int j);
+int vialeft(array<array<int, 8>, 8> &board, int col, int i, int j);
+int viaright(array<array<int, 8>, 8> &board, int col, int i, int j);
+int viaup(array<array<int, 8>, 8> &board, int col, int i, int j);
+int viadown(array<array<int, 8>, 8> &board, int col, int i, int j);
+int upright(array<array<int, 8>, 8> &board, int col, int i, int j);
+int upleft(array<array<int, 8>, 8> &board, int &col, int i, int j);
+int downright(array<array<int, 8>, 8> &board, int &col, int i, int j);
+int downleft(array<array<int, 8>, 8> &board, int &col, int i, int j);
 
-bool legal(vector<vector<int>> &board, int col, int i, int j);
+bool legal(array<array<int, 8>, 8> &board, int col, int i, int j);
 
-void playMoveAssumeLegal(vector<vector<int>> &board, int col, int i, int j);
+void playMoveAssumeLegal(array<array<int, 8>, 8> &board, int col, int i, int j);
 
-void legalMoves(vector<vector<int>> &board, int col, vector<vector<int>> &ret);
+void legalMoves(array<array<int, 8>, 8> &board, int col, vector<vector<int>> &ret);
 
-void printboard(vector<vector<int>> &board);
+void printboard(array<array<int, 8>, 8> &board);
 
-vector<int> won(vector<vector<int>> &board);
+vector<int> won(array<array<int, 8>, 8> &board);

@@ -25,7 +25,7 @@ void Countdown(time_t timeLimit, Node *comp2)
     return;
 }
 
-vector<vector<int>> GetStep(vector<vector<int>> &board, bool is_black)
+array<array<int, 8>, 8> GetStep(array<array<int, 8>, 8> &board, bool is_black)
 {
     //set the root
     root = root->playermove(board);
@@ -57,14 +57,14 @@ int main()
     cout << "How much time can the computer think?(seconds)\n";
     cin >> ThinkTime;
     bool IsBlack = true;
-    vector<vector<int>> board{{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 1, -1, 0, 0, 0},
-                              {0, 0, 0, -1, 1, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    array<array<int, 8>, 8> board = {{{0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 1, -1, 0, 0, 0},
+                                      {0, 0, 0, -1, 1, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0},
+                                      {0, 0, 0, 0, 0, 0, 0, 0}}};
     Source.board = board;
     Source.col = IsBlack ? 1 : -1;
     root = &Source;

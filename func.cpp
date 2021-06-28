@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-int vialeft(vector<vector<int>> &board, int col, int i, int j)
+int vialeft(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (j > 1)
     {
@@ -20,7 +20,7 @@ int vialeft(vector<vector<int>> &board, int col, int i, int j)
     }
     return 0;
 }
-int viaright(vector<vector<int>> &board, int col, int i, int j)
+int viaright(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (j < 6)
     {
@@ -37,7 +37,7 @@ int viaright(vector<vector<int>> &board, int col, int i, int j)
     }
     return 0;
 }
-int viaup(vector<vector<int>> &board, int col, int i, int j)
+int viaup(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (i > 1)
     {
@@ -54,7 +54,7 @@ int viaup(vector<vector<int>> &board, int col, int i, int j)
     }
     return 0;
 }
-int viadown(vector<vector<int>> &board, int col, int i, int j)
+int viadown(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (i < 6)
     {
@@ -71,7 +71,7 @@ int viadown(vector<vector<int>> &board, int col, int i, int j)
     }
     return 0;
 }
-int upright(vector<vector<int>> &board, int col, int i, int j)
+int upright(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (i > 1 && j < 6)
     {
@@ -90,7 +90,7 @@ int upright(vector<vector<int>> &board, int col, int i, int j)
     }
     return 0;
 }
-int upleft(vector<vector<int>> &board, int &col, int i, int j)
+int upleft(array<array<int, 8>, 8> &board, int &col, int i, int j)
 {
     if (i > 1 && j > 1)
     {
@@ -109,7 +109,7 @@ int upleft(vector<vector<int>> &board, int &col, int i, int j)
     }
     return 0;
 }
-int downright(vector<vector<int>> &board, int &col, int i, int j)
+int downright(array<array<int, 8>, 8> &board, int &col, int i, int j)
 {
     if (i < 6 && j < 6)
     {
@@ -128,7 +128,7 @@ int downright(vector<vector<int>> &board, int &col, int i, int j)
     }
     return 0;
 }
-int downleft(vector<vector<int>> &board, int &col, int i, int j)
+int downleft(array<array<int, 8>, 8> &board, int &col, int i, int j)
 {
     if (i < 6 && j > 1)
     {
@@ -147,7 +147,7 @@ int downleft(vector<vector<int>> &board, int &col, int i, int j)
     }
     return 0;
 }
-bool legal(vector<vector<int>> &board, int col, int i, int j)
+bool legal(array<array<int, 8>, 8> &board, int col, int i, int j)
 {
     if (board[i][j] != 0)
         return 0;
@@ -170,7 +170,7 @@ bool legal(vector<vector<int>> &board, int col, int i, int j)
     return 0;
 }
 
-void playMoveAssumeLegal(vector<vector<int>> &board, int col, int x, int y)
+void playMoveAssumeLegal(array<array<int, 8>, 8> &board, int col, int x, int y)
 {
     board[x][y] = col;
     int dis = vialeft(board, col, x, y);
@@ -233,7 +233,7 @@ void playMoveAssumeLegal(vector<vector<int>> &board, int col, int x, int y)
 }
 
 //give list of coordinates, col of next step
-void legalMoves(vector<vector<int>> &board, int col, vector<vector<int>> &ret)
+void legalMoves(array<array<int, 8>, 8> &board, int col, vector<vector<int>> &ret)
 {
     vector<int> matt{0, 0};
     for (int i = 0; i < 8; i++)
@@ -247,7 +247,7 @@ void legalMoves(vector<vector<int>> &board, int col, vector<vector<int>> &ret)
 }
 
 //print the board
-void printboard(vector<vector<int>> &board)
+void printboard(array<array<int, 8>, 8> &board)
 {
     cout << "   0   1   2   3   4   5   6   7" << endl;
     for (int i = 0; i < board.size(); i++)
@@ -274,7 +274,7 @@ void printboard(vector<vector<int>> &board)
 
 //ret[0] = win color @ = 1 , O = -1
 //ret[1] = game finished or not
-vector<int> won(vector<vector<int>> &board)
+vector<int> won(array<array<int, 8>, 8> &board)
 {
     vector<int> ret{0, 0};
     vector<vector<int>> choices;

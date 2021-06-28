@@ -1,4 +1,5 @@
 #include <mutex>
+#include <array>
 #include <vector>
 #include <deque>
 using namespace std;
@@ -11,22 +12,23 @@ class Node
 private:
     mutex mtx;
     mutex child_mtx;
+
 public:
     int col;
     bool haschild = false;
     int gameover = -2;
     int wins = 0;
     int totalgames = 0;
-    vector<vector<int>> board;
+    array<array<int, 8>, 8> board;
     vector<vector<int>> moves;
     deque<Node> children;
 
     Node();
     Node(const Node &t);
-    Node(vector<vector<int>> &bd, int co);
-    Node(vector<vector<int>> &bd, int &x, int &y, int co);
+    Node(array<array<int, 8>, 8> &bd, int co);
+    Node(array<array<int, 8>, 8> &bd, int &x, int &y, int co);
 
-    Node *playermove(vector<vector<int>> &target);
+    Node *playermove(array<array<int, 8>, 8> &target);
     float UCB(int &N);
 
     void clean();

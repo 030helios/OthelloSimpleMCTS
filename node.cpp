@@ -14,20 +14,20 @@ Node::Node(const Node &t)
     board = t.board;
 }
 //init as pass
-Node::Node(vector<vector<int>> &bd, int co)
+Node::Node(array<array<int, 8>, 8> &bd, int co)
 {
     col = co;
     board = bd;
 }
 //init with move to generate child node
-Node::Node(vector<vector<int>> &bd, int &x, int &y, int co)
+Node::Node(array<array<int, 8>, 8> &bd, int &x, int &y, int co)
 {
     board = bd;
     playMoveAssumeLegal(board, co, x, y);
     col = -co;
 }
 //returns child that matches the input
-Node *Node::playermove(vector<vector<int>> &target)
+Node *Node::playermove(array<array<int, 8>, 8> &target)
 {
     if (!haschild)
         return this;
@@ -39,10 +39,8 @@ Node *Node::playermove(vector<vector<int>> &target)
 //return UCB
 float Node::UCB(int &N)
 {
-    if (gameover == col)
-        return -INFINITY;
-    else if (gameover == -col)
-        return INFINITY;
+    if (gameover != -2)
+        return -INFINITY * col * gameover;
     if (totalgames)
     {
         float a = global_C * sqrt((log(N)) / ((float)totalgames));
@@ -108,6 +106,8 @@ int Node::explore()
         std::lock_guard<std::mutex> lock(mtx);
         if (!newmove)
             gameover = children[index].gameover;
+        else if (children[index].gameover == col)
+            gameover = col;
         totalgames++;
         wins += (outcome == col);
         return outcome;
