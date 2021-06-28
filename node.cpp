@@ -1,10 +1,8 @@
 #include "func.h"
 #include "node.h"
-#include <algorithm>
-#include <mutex>
 #include <math.h>
-#include <vector>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 Node::Node() {}
@@ -29,7 +27,7 @@ Node::Node(array<array<int, 8>, 8> &bd, int &x, int &y, int co)
 //returns child that matches the input
 Node *Node::playermove(array<array<int, 8>, 8> &target)
 {
-    if (!haschild)
+    if (haschild == 0)
         return this;
     while (children[0].board != target)
         children.pop_front();
@@ -58,33 +56,38 @@ void Node::clean()
     for (int i = 0; i < childsize; i++)
         children[i].clean();
 }
-//build the moves vector, pass if needed
+//discover moves and store in haschild, pass if needed
 void Node::getmoves()
 {
-    haschild = true;
-    legalMoves(board, col, moves);
-    if (moves.size() == 0)
+    legalMoves(board, col, moves, haschild);
+    if (!haschild)
+    {
+        haschild = -1;
         if (!won(board)[1])
         {
             Node kid(board, -col);
             children.push_back(kid);
         }
+    }
+    else
+        random_shuffle(moves.begin(), moves.begin() + haschild - 1);
 }
 int Node::explore()
 {
     int index;
     bool newmove = false;
     {
-        std::lock_guard<std::mutex> lock(this->child_mtx);
-        if (!haschild)
+        std::lock_guard<std::mutex> lock(child_mtx);
+        if (haschild == 0)
             getmoves();
-        if (moves.size())
+        if (haschild > 0)
         {
+            haschild--;
             index = children.size();
-            int i = rand() % moves.size();
-            Node kid(board, moves[i][0], moves[i][1], col);
-            moves.erase(moves.begin() + i);
+            Node kid(board, moves[haschild].first, moves[haschild].second, col);
             children.push_back(kid);
+            if (haschild == 0)
+                haschild--;
             newmove = true;
         }
         else
@@ -124,6 +127,11 @@ int Node::select()
     {
         ucb = children[i].UCB(totalgames);
         if (ucb > ucbmax)
+        {
+            ucbmax = ucb;
+            imax = i;
+        }
+        else if (ucb == ucbmax && rand() % 2)
         {
             ucbmax = ucb;
             imax = i;

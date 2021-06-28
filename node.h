@@ -1,7 +1,7 @@
 #include <mutex>
 #include <array>
-#include <vector>
 #include <deque>
+#include <utility>
 using namespace std;
 
 #define global_C 0.5
@@ -15,12 +15,12 @@ private:
 
 public:
     int col;
-    bool haschild = false;
+    int haschild = 0;
     int gameover = -2;
     int wins = 0;
     int totalgames = 0;
     array<array<int, 8>, 8> board;
-    vector<vector<int>> moves;
+    array<pair<int, int>, 24> moves;
     deque<Node> children;
 
     Node();

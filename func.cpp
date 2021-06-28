@@ -1,5 +1,4 @@
 #include "func.h"
-#include <vector>
 #include <iostream>
 using namespace std;
 
@@ -233,16 +232,15 @@ void playMoveAssumeLegal(array<array<int, 8>, 8> &board, int col, int x, int y)
 }
 
 //give list of coordinates, col of next step
-void legalMoves(array<array<int, 8>, 8> &board, int col, vector<vector<int>> &ret)
+void legalMoves(array<array<int, 8>, 8> &board, int col, array<pair<int, int>, 24> &ret, int &haschild)
 {
-    vector<int> matt{0, 0};
     for (int i = 0; i < 8; i++)
         for (int j = 0; j < 8; j++)
             if (legal(board, col, i, j))
             {
-                matt[0] = i;
-                matt[1] = j;
-                ret.push_back(matt);
+                ret[haschild].first = i;
+                ret[haschild].second = j;
+                haschild ++;
             }
 }
 
@@ -277,12 +275,13 @@ void printboard(array<array<int, 8>, 8> &board)
 vector<int> won(array<array<int, 8>, 8> &board)
 {
     vector<int> ret{0, 0};
-    vector<vector<int>> choices;
-    legalMoves(board, 1, choices);
-    if (choices.size() == 0)
+    array<pair<int, int>, 24> choices;
+    int haschild = 0;
+    legalMoves(board, 1, choices, haschild);
+    if (!haschild)
     {
-        legalMoves(board, -1, choices);
-        if (choices.size() == 0)
+        legalMoves(board, -1, choices, haschild);
+        if (!haschild)
         {
             //no more moves
             int re = 0;
