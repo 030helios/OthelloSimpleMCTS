@@ -1,7 +1,6 @@
 #include "func.h"
 #include "node.h"
 #include <math.h>
-#include <iostream>
 #include <algorithm>
 using namespace std;
 

@@ -1,5 +1,4 @@
 #include "func.h"
-#include <iostream>
 using namespace std;
 
 int vialeft(array<int8_t, 64> &board, int8_t &col, int i, int j)
@@ -245,31 +244,17 @@ void legalMoves(array<int8_t, 64> &board, int8_t &col, array<pair<int8_t, int8_t
 }
 
 //print the board
-void printboard(array<int8_t, 64> &board)
+void printboard(array<int8_t, 64> board)
 {
-    cout << "   0   1   2   3   4   5   6   7" << endl;
-    for (int i = 0; i < 8; i++)
-    {
-        cout << char('A' + i) << "  ";
-        for (int j = 0; j < 8; j++)
-        {
-            switch (board[i * 8 + j])
-            {
-            case 0:
-                cout << ".   ";
-                break;
-            case 1:
-                cout << "@   ";
-                break;
-            case -1:
-                cout << "O   ";
-                break;
-            }
-        }
-        cout << "\n\n";
+    string str = "./eyesore.py ";
+    for (int i = 0; i < 64; i++){
+        str += to_string(board[i]);
+        str += ".";
     }
+    char exe[str.length()];
+    strcpy(exe,str.c_str());
+    system(exe);
 }
-
 //ret[0] = win color @ = 1 , O = -1
 //ret[1] = game finished or not
 vector<int> won(array<int8_t, 64> &board)

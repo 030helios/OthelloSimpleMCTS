@@ -42,34 +42,34 @@ array<int8_t, 64> GetStep(array<int8_t, 64> board, int &ThinkTime, int threadCou
 
 int main()
 {
-    int timeLimit;
-    cout << "How much time can the computer think?(seconds)\n";
-    cin >> timeLimit;
+    int timeLimit = 2;
     //black
     int computerColor = 1;
-    array<int8_t, 64> board{{0, 0, 0, 0, 0, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0,
-                          0, 0, 0, 1, -1, 0, 0, 0,
-                          0, 0, 0, -1, 1, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0}};
+    array<int8_t, 64> board{0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 1, -1, 0, 0, 0,
+                            0, 0, 0, -1, 1, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0};
     Node Source(board, computerColor);
     Node *root = &Source;
+    vector<thread> threadvec;
     while (won(board)[1] == 0)
     {
         //default 8 thread
         board = GetStep(board, timeLimit, 8, root);
-        printboard(board);
+        for (int i = 0; i < threadvec.size(); i++)
+            threadvec[i].join();
+        threadvec.clear();
+        threadvec.emplace_back(printboard, board);
         board = root->children[rand() % root->children.size()].board;
-        printboard(board);
+        for (int i = 0; i < threadvec.size(); i++)
+            threadvec[i].join();
+        threadvec.clear();
+        threadvec.emplace_back(printboard, board);
+        cout << endl;
     }
-    if (won(board)[0] < 0)
-        cout << "winner: 0\n";
-    else if (won(board)[0] > 0)
-        cout << "winner: @\n";
-    else
-        cout << "draw\n";
     return 0;
 }
