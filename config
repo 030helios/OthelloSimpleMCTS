@@ -1,0 +1,3 @@
+#define global_C 0.6
+#define EdgeSize 8
+#define BoardSize 64

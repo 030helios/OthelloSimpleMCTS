@@ -15,7 +15,7 @@ void Countdown(time_t timeLimit, Node *root)
         root->explore();
     return;
 }
-array<int8_t, 64> GetStep(array<int8_t, 64> board, int &thinkTime, int threadCount, Node *&root)
+array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime, int threadCount, Node *&root)
 {
     time_t timeLimit = time(0) + thinkTime;
     //set the root
@@ -41,8 +41,8 @@ array<int8_t, 64> GetStep(array<int8_t, 64> board, int &thinkTime, int threadCou
 
 int main()
 {
-    int timeLimit = 200;
-    cout << "timeLimit\n";
+    int timeLimit;
+    cout << "timeLimit :";
     cin >> timeLimit;
     //black
     int computerColor = 1;
@@ -60,8 +60,8 @@ int main()
     while (won(board)[1] == 0)
     {
         printboard(board);
-        //default 8 thread
-        board = GetStep(board, timeLimit, 8, root);
+        //default EdgeSize thread
+        board = GetStep(board, timeLimit, EdgeSize, root);
     }
     printboard(board);
     cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
