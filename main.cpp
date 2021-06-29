@@ -46,14 +46,13 @@ int main()
     cin >> timeLimit;
     //black
     int computerColor = 1;
-    array<int8_t, 64> board{0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 1, -1, 0, 0, 0,
-                            0, 0, 0, -1, 1, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0,
-                            0, 0, 0, 0, 0, 0, 0, 0};
+    array<int8_t, BoardSize> board{};
+    int d = EdgeSize / 2 + EdgeSize * EdgeSize / 2;
+    board[d] = 1;
+    board[d - 1] = -1;
+    d -= EdgeSize;
+    board[d] = -1;
+    board[d - 1] = 1;
     Node Source(board, computerColor);
     Node *root = &Source;
     vector<thread> threadvec;
