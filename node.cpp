@@ -116,12 +116,7 @@ Node *Node::select()
     for (auto child = children.begin(); child != children.cend(); child++)
     {
         float ucb = child->UCB(total, col);
-        if (ucb > ucbmax)
-        {
-            ucbmax = ucb;
-            best = &*child;
-        }
-        else if (ucb == ucbmax && rand() % 2)
+        if (ucb > ucbmax || (ucb == ucbmax && rand() % 2))
         {
             ucbmax = ucb;
             best = &*child;
@@ -141,7 +136,7 @@ Node *Node::getbest()
 {
     int imax = 0;
     for (int i = 0; i < children.size(); i++)
-        if (children[i].totalgames > children[imax].totalgames)
+        if (children[i].totalgames > children[imax].totalgames || children[i].gameover == col)
             imax = i;
     for (int i = 0; i < imax; i++)
         children.pop_front();

@@ -17,11 +17,10 @@ void Countdown(time_t timeLimit, Node *root)
 }
 array<int8_t, 64> GetStep(array<int8_t, 64> board, int &thinkTime, int threadCount, Node *&root)
 {
+    time_t timeLimit = time(0) + thinkTime;
     //set the root
     root = root->playermove(board);
     root->clean();
-
-    time_t timeLimit = time(0) + thinkTime;
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
@@ -35,7 +34,7 @@ array<int8_t, 64> GetStep(array<int8_t, 64> board, int &thinkTime, int threadCou
     root = root->getbest();
     float winrate = float(root->wins) / root->totalgames;
     if (winrate == 0 || winrate == 1 || root->gameover != -2)
-        thinkTime = 0;
+        thinkTime = 1;
     cout << "winrate estimate: " << 1 - winrate << endl;
     return root->board;
 }
@@ -60,10 +59,11 @@ int main()
     vector<thread> threadvec;
     while (won(board)[1] == 0)
     {
+        printboard(board);
         //default 8 thread
         board = GetStep(board, timeLimit, 8, root);
-        printboard(board);
     }
+    printboard(board);
     cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
     return 0;
 }
