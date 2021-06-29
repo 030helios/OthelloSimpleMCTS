@@ -13,5 +13,14 @@ for stone in sys.argv[1].split('.'):
     i += 1
 img = np.uint8(img)
 img = cv2.resize(img, (512, 512), interpolation=cv2.INTER_AREA)
-cv2.imshow("image", img)
-key = cv2.waitKey(2500)
+bordersize = 10
+img = cv2.copyMakeBorder(
+    img,
+    top=bordersize,
+    bottom=bordersize,
+    left=bordersize,
+    right=bordersize,
+    borderType=cv2.BORDER_CONSTANT,
+    value=[50, 50, 50]
+)
+cv2.imwrite('output.jpg', img)

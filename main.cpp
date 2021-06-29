@@ -15,13 +15,13 @@ void Countdown(time_t timeLimit, Node *root)
         root->explore();
     return;
 }
-array<int8_t, 64> GetStep(array<int8_t, 64> board, int &ThinkTime, int threadCount, Node *&root)
+array<int8_t, 64> GetStep(array<int8_t, 64> board, int &thinkTime, int threadCount, Node *&root)
 {
     //set the root
     root = root->playermove(board);
     root->clean();
 
-    time_t timeLimit = time(0) + ThinkTime;
+    time_t timeLimit = time(0) + thinkTime;
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
@@ -31,18 +31,20 @@ array<int8_t, 64> GetStep(array<int8_t, 64> board, int &ThinkTime, int threadCou
         threadvec[i].join();
 
     cout << "Total playouts: " << root->totalgames << endl;
+    cout << (root->col == 1 ? "Black " : "White ");
     root = root->getbest();
     float winrate = float(root->wins) / root->totalgames;
-    cout << "Player wins: " << root->wins << endl;
-    cout << "Player winrate estimate: " << winrate << endl;
-    if (winrate == 0)
-        ThinkTime = 0;
+    if (winrate == 0 || winrate == 1 || root->gameover != -2)
+        thinkTime = 0;
+    cout << "winrate estimate: " << 1 - winrate << endl;
     return root->board;
 }
 
 int main()
 {
-    int timeLimit = 2;
+    int timeLimit = 200;
+    cout << "timeLimit\n";
+    cin >> timeLimit;
     //black
     int computerColor = 1;
     array<int8_t, 64> board{0, 0, 0, 0, 0, 0, 0, 0,
@@ -60,16 +62,8 @@ int main()
     {
         //default 8 thread
         board = GetStep(board, timeLimit, 8, root);
-        for (int i = 0; i < threadvec.size(); i++)
-            threadvec[i].join();
-        threadvec.clear();
-        threadvec.emplace_back(printboard, board);
-        board = root->children[rand() % root->children.size()].board;
-        for (int i = 0; i < threadvec.size(); i++)
-            threadvec[i].join();
-        threadvec.clear();
-        threadvec.emplace_back(printboard, board);
-        cout << endl;
+        printboard(board);
     }
+    cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
     return 0;
 }

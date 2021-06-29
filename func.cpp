@@ -247,12 +247,13 @@ void legalMoves(array<int8_t, 64> &board, int8_t &col, array<pair<int8_t, int8_t
 void printboard(array<int8_t, 64> board)
 {
     string str = "./eyesore.py ";
-    for (int i = 0; i < 64; i++){
+    for (int i = 0; i < 64; i++)
+    {
         str += to_string(board[i]);
         str += ".";
     }
     char exe[str.length()];
-    strcpy(exe,str.c_str());
+    strcpy(exe, str.c_str());
     system(exe);
 }
 //ret[0] = win color @ = 1 , O = -1

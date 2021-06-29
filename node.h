@@ -29,12 +29,12 @@ public:
     Node(array<int8_t, 64> &bd, int8_t &x, int8_t &y, int8_t co);
 
     Node *playermove(array<int8_t, 64> &target);
-    float UCB(int &N);
+    float UCB(int &N, int8_t co);
 
     void clean();
     void getmoves();
 
     int8_t explore();
-    int8_t select();
+    Node *select();
     Node *getbest();
 };
