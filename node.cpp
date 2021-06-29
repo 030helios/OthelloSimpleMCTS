@@ -40,7 +40,7 @@ float Node::UCB(int &N, int8_t parentColor)
     {
         if (gameover != -2)
             return 1000 * parentColor * gameover;
-        float a = global_C * sqrt((log(N)) / ((float)totalgames));
+        float a = sqrt(2 * log(N) / (float)totalgames);
         a += ((float)(totalgames - wins) / (totalgames));
         return a;
     }
@@ -136,8 +136,15 @@ Node *Node::getbest()
 {
     int imax = 0;
     for (int i = 0; i < children.size(); i++)
-        if (children[i].totalgames > children[imax].totalgames || children[i].gameover == col)
+    {
+        if (children[i].gameover == col)
+        {
             imax = i;
+            break;
+        }
+        if (children[i].totalgames > children[imax].totalgames)
+            imax = i;
+    }
     for (int i = 0; i < imax; i++)
         children.pop_front();
     children.resize(1);
