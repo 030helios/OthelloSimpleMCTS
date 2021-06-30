@@ -1,9 +1,7 @@
 #include "config"
 #include <array>
-#include <deque>
 #include <vector>
 #include <random>
-#include <iostream>
 #include <cstring>
 using namespace std;
 

@@ -2,7 +2,9 @@
 #include <mutex>
 #include <array>
 #include <deque>
+#include <math.h>
 #include <utility>
+#include <algorithm>
 using namespace std;
 
 //the tree node  of MCTS

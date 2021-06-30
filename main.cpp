@@ -1,8 +1,6 @@
 #include "func.h"
 #include "node.h"
 #include <time.h>
-#include <math.h>
-#include <random>
 #include <thread>
 #include <stdlib.h>
 #include <iostream>
@@ -20,7 +18,7 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
     time_t timeLimit = time(0) + thinkTime;
     //set the root
     root = root->playermove(board);
-    root->clean();
+    //root->clean();
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
@@ -41,6 +39,8 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
 
 int main()
 {
+    random_device rd;
+    srand(rd());
     int timeLimit;
     cout << "timeLimit :";
     cin >> timeLimit;
@@ -56,7 +56,7 @@ int main()
     Node Source(board, computerColor);
     Node *root = &Source;
     vector<thread> threadvec;
-    while (won(board)[1] == 0)
+    while (won(board)[1] == 0 && root->gameover == -2)
     {
         printboard(board);
         //default EdgeSize thread

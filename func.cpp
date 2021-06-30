@@ -145,29 +145,92 @@ int downleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
+
 bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
 {
     if (board[i * EdgeSize + j] != 0)
         return 0;
-    if (vialeft(board, col, i, j))
-        return 1;
-    if (viaright(board, col, i, j))
-        return 1;
-    if (viaup(board, col, i, j))
-        return 1;
-    if (viadown(board, col, i, j))
-        return 1;
-    if (upleft(board, col, i, j))
-        return 1;
-    if (upright(board, col, i, j))
-        return 1;
-    if (downleft(board, col, i, j))
-        return 1;
-    if (downright(board, col, i, j))
-        return 1;
+    if (i <= 1)
+    {
+        if (viadown(board, col, i, j))
+            return 1;
+        if (j <= 1)
+        {
+            if (viaright(board, col, i, j))
+                return 1;
+            if (downright(board, col, i, j))
+                return 1;
+        }
+        else if (j >= EdgeSize - 2)
+        {
+            if (vialeft(board, col, i, j))
+                return 1;
+            if (downleft(board, col, i, j))
+                return 1;
+        }
+        else
+        {
+            if (vialeft(board, col, i, j))
+                return 1;
+            if (downleft(board, col, i, j))
+                return 1;
+            if (viaright(board, col, i, j))
+                return 1;
+            if (downright(board, col, i, j))
+                return 1;
+        }
+    }
+    else if (i >= EdgeSize - 2)
+    {
+        if (viaup(board, col, i, j))
+            return 1;
+        if (j <= 1)
+        {
+            if (viaright(board, col, i, j))
+                return 1;
+            if (upright(board, col, i, j))
+                return 1;
+        }
+        else if (j >= EdgeSize - 2)
+        {
+            if (vialeft(board, col, i, j))
+                return 1;
+            if (upleft(board, col, i, j))
+                return 1;
+        }
+        else
+        {
+            if (vialeft(board, col, i, j))
+                return 1;
+            if (upleft(board, col, i, j))
+                return 1;
+            if (viaright(board, col, i, j))
+                return 1;
+            if (upright(board, col, i, j))
+                return 1;
+        }
+    }
+    else
+    {
+        if (vialeft(board, col, i, j))
+            return 1;
+        if (viaright(board, col, i, j))
+            return 1;
+        if (viaup(board, col, i, j))
+            return 1;
+        if (viadown(board, col, i, j))
+            return 1;
+        if (upleft(board, col, i, j))
+            return 1;
+        if (upright(board, col, i, j))
+            return 1;
+        if (downleft(board, col, i, j))
+            return 1;
+        if (downright(board, col, i, j))
+            return 1;
+    }
     return 0;
 }
-
 void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
 {
     board[x * EdgeSize + y] = col;
@@ -229,7 +292,6 @@ void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, in
         }
     }
 }
-
 //give list of coordinates, col of next step
 void legalMoves(array<int8_t, BoardSize> &board, int8_t &col, array<pair<int8_t, int8_t>, 25> &ret, int8_t &haschild)
 {
