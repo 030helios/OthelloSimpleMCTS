@@ -1,7 +1,7 @@
 #include "func.h"
 using namespace std;
 
-int vialeft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+int toleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
 {
     if (j > 1)
     {
@@ -18,7 +18,7 @@ int vialeft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
-int viaright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+int toright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
 {
     if (j < (EdgeSize - 2))
     {
@@ -35,7 +35,7 @@ int viaright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
-int viaup(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+int toup(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
 {
     if (i > 1)
     {
@@ -52,7 +52,7 @@ int viaup(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
-int viadown(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+int todown(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
 {
     if (i < (EdgeSize - 2))
     {
@@ -152,29 +152,29 @@ bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
         return 0;
     if (i <= 1)
     {
-        if (viadown(board, col, i, j))
+        if (todown(board, col, i, j))
             return 1;
         if (j <= 1)
         {
-            if (viaright(board, col, i, j))
+            if (toright(board, col, i, j))
                 return 1;
             if (downright(board, col, i, j))
                 return 1;
         }
         else if (j >= EdgeSize - 2)
         {
-            if (vialeft(board, col, i, j))
+            if (toleft(board, col, i, j))
                 return 1;
             if (downleft(board, col, i, j))
                 return 1;
         }
         else
         {
-            if (vialeft(board, col, i, j))
+            if (toleft(board, col, i, j))
                 return 1;
             if (downleft(board, col, i, j))
                 return 1;
-            if (viaright(board, col, i, j))
+            if (toright(board, col, i, j))
                 return 1;
             if (downright(board, col, i, j))
                 return 1;
@@ -182,29 +182,29 @@ bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     else if (i >= EdgeSize - 2)
     {
-        if (viaup(board, col, i, j))
+        if (toup(board, col, i, j))
             return 1;
         if (j <= 1)
         {
-            if (viaright(board, col, i, j))
+            if (toright(board, col, i, j))
                 return 1;
             if (upright(board, col, i, j))
                 return 1;
         }
         else if (j >= EdgeSize - 2)
         {
-            if (vialeft(board, col, i, j))
+            if (toleft(board, col, i, j))
                 return 1;
             if (upleft(board, col, i, j))
                 return 1;
         }
         else
         {
-            if (vialeft(board, col, i, j))
+            if (toleft(board, col, i, j))
                 return 1;
             if (upleft(board, col, i, j))
                 return 1;
-            if (viaright(board, col, i, j))
+            if (toright(board, col, i, j))
                 return 1;
             if (upright(board, col, i, j))
                 return 1;
@@ -212,13 +212,13 @@ bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     else
     {
-        if (vialeft(board, col, i, j))
+        if (toleft(board, col, i, j))
             return 1;
-        if (viaright(board, col, i, j))
+        if (toright(board, col, i, j))
             return 1;
-        if (viaup(board, col, i, j))
+        if (toup(board, col, i, j))
             return 1;
-        if (viadown(board, col, i, j))
+        if (todown(board, col, i, j))
             return 1;
         if (upleft(board, col, i, j))
             return 1;
@@ -231,24 +231,44 @@ bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
-void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
-{
-    board[x * EdgeSize + y] = col;
-    int dis = vialeft(board, col, x, y);
-    for (int j = y - 1; j != y - 1 - dis; j--)
-        board[x * EdgeSize + j] = col;
-    dis = viaright(board, col, x, y);
-    for (int j = y + 1; j != y + 1 + dis; j++)
-        board[x * EdgeSize + j] = col;
-    dis = viaup(board, col, x, y);
-    for (int i = x - 1; i != x - 1 - dis; i--)
-        board[i * EdgeSize + y] = col;
-    dis = viadown(board, col, x, y);
-    for (int i = x + 1; i != x + 1 + dis; i++)
-        board[i * EdgeSize + y] = col;
 
-    dis = upright(board, col, x, y);
+bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
+{
+    if (board[x * EdgeSize + y] != 0)
+        return false;
+    bool touched = false;
+    int dis = toleft(board, col, x, y);
+    if (dis)
     {
+        touched = true;
+        for (int j = y - 1; j != y - 1 - dis; j--)
+            board[x * EdgeSize + j] = col;
+    }
+    dis = toright(board, col, x, y);
+    if (dis)
+    {
+        touched = true;
+        for (int j = y + 1; j != y + 1 + dis; j++)
+            board[x * EdgeSize + j] = col;
+    }
+    dis = toup(board, col, x, y);
+    if (dis)
+    {
+        touched = true;
+        for (int i = x - 1; i != x - 1 - dis; i--)
+            board[i * EdgeSize + y] = col;
+    }
+    dis = todown(board, col, x, y);
+    if (dis)
+    {
+        touched = true;
+        for (int i = x + 1; i != x + 1 + dis; i++)
+            board[i * EdgeSize + y] = col;
+    }
+    dis = upright(board, col, x, y);
+    if (dis)
+    {
+        touched = true;
         int i = x;
         int j = y;
         while (i != x - dis)
@@ -259,7 +279,9 @@ void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, in
         }
     }
     dis = upleft(board, col, x, y);
+    if (dis)
     {
+        touched = true;
         int i = x;
         int j = y;
         while (i != x - dis)
@@ -270,7 +292,9 @@ void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, in
         }
     }
     dis = downright(board, col, x, y);
+    if (dis)
     {
+        touched = true;
         int i = x;
         int j = y;
         while (i != x + dis)
@@ -281,7 +305,9 @@ void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, in
         }
     }
     dis = downleft(board, col, x, y);
+    if (dis)
     {
+        touched = true;
         int i = x;
         int j = y;
         while (i != x + dis)
@@ -291,22 +317,20 @@ void playMoveAssumeLegal(array<int8_t, BoardSize> &board, int8_t &col, int x, in
             board[i * EdgeSize + j] = col;
         }
     }
+    if (touched)
+        board[x * EdgeSize + y] = col;
+    return touched;
 }
-//give list of coordinates, col of next step
-void legalMoves(array<int8_t, BoardSize> &board, int8_t &col, array<pair<int8_t, int8_t>, 25> &ret, int8_t &haschild)
+//return true if we made a move
+bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex)
 {
-    for (int i = 0; i < EdgeSize; i++)
-        for (int j = 0; j < EdgeSize; j++)
-            if (legal(board, col, i, j))
-            {
-                ret[haschild].first = i;
-                ret[haschild].second = j;
-                haschild++;
-            }
+    while (!tryMove(board, col, RdMoves[RdId][moveIndex].first, RdMoves[RdId][moveIndex].second))
+        if (--moveIndex < 0)
+            return false;
+    moveIndex--;
+    return true;
 }
-
-//print the board
-void printboard(array<int8_t, BoardSize> board)
+void printboard(array<int8_t, BoardSize> board, string name)
 {
     string str = "./eyesore.py ";
     str += to_string(EdgeSize) + " ";
@@ -315,38 +339,31 @@ void printboard(array<int8_t, BoardSize> board)
         str += to_string(board[i]);
         str += ".";
     }
+    str += " " + name;
     char exe[str.length()];
     strcpy(exe, str.c_str());
     system(exe);
+}
+bool hasMove(array<int8_t, BoardSize> &board, int8_t col)
+{
+    for (int i = 0; i < EdgeSize; i++)
+        for (int j = 0; j < EdgeSize; j++)
+            if (legal(board, col, i, j))
+                return true;
+    return false;
 }
 //ret[0] = win color @ = 1 , O = -1
 //ret[1] = game finished or not
 vector<int> won(array<int8_t, BoardSize> &board)
 {
     vector<int> ret{0, 0};
-    array<pair<int8_t, int8_t>, 25> choices;
-    int8_t haschild = 0;
-    int8_t col = 1;
-    legalMoves(board, col, choices, haschild);
-    if (!haschild)
-    {
-        col = -1;
-        legalMoves(board, col, choices, haschild);
-        if (!haschild)
+    if (!hasMove(board, 1))
+        if (!hasMove(board, -1))
         {
-            //no more moves
-            int re = 0;
-            for (int i = 0; i < EdgeSize; i++)
-                for (int j = 0; j < EdgeSize; j++)
-                    re += board[i * EdgeSize + j];
-            //re is the final count of their pieces
-            if (re > 0)
-                ret[0] = 1;
-            else if (re < 0)
-                ret[0] = -1;
             ret[1] = 1;
-            return ret;
+            for (auto stone : board)
+                ret[0] += stone;
+            ret[0] = (ret[0] > 0) - (ret[0] < 0);
         }
-    }
     return ret;
 }

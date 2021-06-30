@@ -25,4 +25,5 @@ img = cv2.copyMakeBorder(
     borderType=cv2.BORDER_CONSTANT,
     value=[50, 50, 50]
 )
-cv2.imwrite('output.jpg', img)
+
+cv2.imwrite(sys.argv[3], img)
