@@ -1,2 +1,2 @@
 #define EdgeSize 8
-#define BoardSize 64
+#define BoardSize (EdgeSize * EdgeSize)

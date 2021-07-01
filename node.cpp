@@ -58,7 +58,6 @@ int8_t Node::explore()
                 }
                 else if (!hasMove(board, -col))
                 { //won
-                    children.pop_back();
                     gameover = 0;
                     for (auto stone : board)
                         gameover += stone;
@@ -132,18 +131,15 @@ Node *Node::getbest()
 Node *Node::playermove(array<int8_t, BoardSize> &target)
 {
     if (target != board)
-    {
         while (children.size())
             if (children.front().board != target)
                 children.pop_front();
             else
-            {
-                children.resize(1);
-                children.shrink_to_fit();
-                return &children[0];
-            }
-    }
+                break;
     if (children[0].board == target)
+    {
+        children.resize(1);
         return &children[0];
+    }
     return this;
 }

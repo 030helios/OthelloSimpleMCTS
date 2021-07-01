@@ -146,92 +146,6 @@ int downleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     return 0;
 }
 
-bool legal(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
-{
-    if (board[i * EdgeSize + j] != 0)
-        return 0;
-    if (i <= 1)
-    {
-        if (todown(board, col, i, j))
-            return 1;
-        if (j <= 1)
-        {
-            if (toright(board, col, i, j))
-                return 1;
-            if (downright(board, col, i, j))
-                return 1;
-        }
-        else if (j >= EdgeSize - 2)
-        {
-            if (toleft(board, col, i, j))
-                return 1;
-            if (downleft(board, col, i, j))
-                return 1;
-        }
-        else
-        {
-            if (toleft(board, col, i, j))
-                return 1;
-            if (downleft(board, col, i, j))
-                return 1;
-            if (toright(board, col, i, j))
-                return 1;
-            if (downright(board, col, i, j))
-                return 1;
-        }
-    }
-    else if (i >= EdgeSize - 2)
-    {
-        if (toup(board, col, i, j))
-            return 1;
-        if (j <= 1)
-        {
-            if (toright(board, col, i, j))
-                return 1;
-            if (upright(board, col, i, j))
-                return 1;
-        }
-        else if (j >= EdgeSize - 2)
-        {
-            if (toleft(board, col, i, j))
-                return 1;
-            if (upleft(board, col, i, j))
-                return 1;
-        }
-        else
-        {
-            if (toleft(board, col, i, j))
-                return 1;
-            if (upleft(board, col, i, j))
-                return 1;
-            if (toright(board, col, i, j))
-                return 1;
-            if (upright(board, col, i, j))
-                return 1;
-        }
-    }
-    else
-    {
-        if (toleft(board, col, i, j))
-            return 1;
-        if (toright(board, col, i, j))
-            return 1;
-        if (toup(board, col, i, j))
-            return 1;
-        if (todown(board, col, i, j))
-            return 1;
-        if (upleft(board, col, i, j))
-            return 1;
-        if (upright(board, col, i, j))
-            return 1;
-        if (downleft(board, col, i, j))
-            return 1;
-        if (downright(board, col, i, j))
-            return 1;
-    }
-    return 0;
-}
-
 bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
 {
     if (board[x * EdgeSize + y] != 0)
@@ -324,7 +238,8 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
 //return true if we made a move
 bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex)
 {
-    while (!tryMove(board, col, RdMoves[RdId][moveIndex].first, RdMoves[RdId][moveIndex].second))
+    array<pair<int8_t, int8_t>, BoardSize> &MoveArr = RdMoves[RdId];
+    while (!tryMove(board, col, MoveArr[moveIndex].first, MoveArr[moveIndex].second))
         if (--moveIndex < 0)
             return false;
     moveIndex--;
@@ -344,13 +259,11 @@ void printboard(array<int8_t, BoardSize> board, string name)
     strcpy(exe, str.c_str());
     system(exe);
 }
-bool hasMove(array<int8_t, BoardSize> &board, int8_t col)
+bool hasMove(array<int8_t, BoardSize> board, int8_t col)
 {
-    for (int i = 0; i < EdgeSize; i++)
-        for (int j = 0; j < EdgeSize; j++)
-            if (legal(board, col, i, j))
-                return true;
-    return false;
+    int8_t moveIndex = BoardSize - 1;
+    int8_t zero = 0;
+    return newMove(board, col, zero, moveIndex);
 }
 //ret[0] = win color @ = 1 , O = -1
 //ret[1] = game finished or not

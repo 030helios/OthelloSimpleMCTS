@@ -34,7 +34,7 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
     root = root->getbest();
     float winrate = float(root->wins) / root->totalgames;
     if (winrate == 0 || winrate == 1 || root->gameover != -2)
-        thinkTime = 2;
+        thinkTime = 0;
     cout << "winrate estimate: " << 1 - winrate << endl;
     return root->board;
 }
