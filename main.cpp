@@ -18,7 +18,6 @@ void Countdown(time_t timeLimit, Node *root)
 array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime, int threadCount, Node *&root)
 {
     time_t timeLimit = time(0) + thinkTime;
-    //set the root
     root = root->playermove(board);
     root->clean();
     //initialize thread
@@ -30,12 +29,19 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
         threadvec[i].join();
 
     cout << "Total playouts: " << root->totalgames << endl;
-    cout << (root->col == 1 ? "Black " : "White ");
+    if (root->gameover == -2)
+    {
+        cout << (root->col == 1 ? "Black " : "White ");
+        root = root->getbest();
+        float winrate = float(root->wins) / root->totalgames;
+        cout << "winrate estimate: " << 1 - winrate << endl;
+        return root->board;
+    }
+    else if (root->gameover == 0)
+        cout << "Draw\n";
+    else
+        cout << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
     root = root->getbest();
-    float winrate = float(root->wins) / root->totalgames;
-    if (winrate == 0 || winrate == 1 || root->gameover != -2)
-        thinkTime = 0;
-    cout << "winrate estimate: " << 1 - winrate << endl;
     return root->board;
 }
 
@@ -44,23 +50,17 @@ void init(array<int8_t, BoardSize> &board)
     int d = EdgeSize / 2 + EdgeSize * EdgeSize / 2;
     board[d] = 1;
     board[d - 1] = -1;
-    d -= EdgeSize;
-    board[d] = -1;
-    board[d - 1] = 1;
+    board[d - EdgeSize] = -1;
+    board[d - EdgeSize - 1] = 1;
     srand(time(0));
     array<pair<int8_t, int8_t>, BoardSize> defaultMoves;
-    int index = 0;
     for (int i = 0; i < EdgeSize; i++)
         for (int j = 0; j < EdgeSize; j++)
-        {
-            defaultMoves[index].first = i;
-            defaultMoves[index++].second = j;
-        }
+            defaultMoves[i * EdgeSize + j] = make_pair(i, j);
     for (auto &bd : RdMoves)
-    {
         bd = defaultMoves;
+    for (auto &bd : RdMoves)
         random_shuffle(bd.begin(), bd.end());
-    }
 }
 
 int main()
@@ -79,15 +79,15 @@ int main()
 
     Node Source(board, computerColor);
     Node *root = &Source;
-    string name = "output.jpg";
+    string ImgName = "Output_";
     int index = 0;
     while (won(board)[1] == 0)
     {
-        cout << index << " round" << endl;
-        printboard(board, to_string(index++) + name);
+        cout << "Round " << index << endl;
+        printboard(board, ImgName + to_string(index++) + ".jpg");
         board = GetStep(board, timeLimit, threadCount, root);
     }
-    printboard(board, to_string(index++) + name);
+    printboard(board, ImgName + to_string(index++) + ".jpg");
     cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
     return 0;
 }

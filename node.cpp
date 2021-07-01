@@ -19,11 +19,17 @@ Node::Node(array<int8_t, BoardSize> &bd, int8_t co)
 //return UCB
 float Node::UCB(int &N, int8_t parentColor)
 {
-    lock_guard<mutex> lock(mtx);
+    if (gameover != -2)
+    {
+        if (gameover == 0)
+            if (!totalgames)
+                return 512;
+            else
+                return 1 / 2 + sqrt(2 * log(N) / (float)totalgames);
+        return 1024 * parentColor * gameover;
+    }
     if (!totalgames)
         return 512;
-    if (gameover != -2)
-        return 1024 * parentColor * gameover;
     float a = sqrt(2 * log(N) / (float)totalgames);
     a += ((float)(totalgames - wins) / (totalgames));
     return a;
@@ -40,12 +46,10 @@ int8_t Node::explore()
 {
     Node *child;
     {
-        lock_guard<mutex> lock(child_mtx);
-        {
-            lock_guard<mutex> lock(mtx);
-            if (gameover != -2)
-                return gameover;
-        }
+        lock_guard<mutex> lock(mtx);
+        if (gameover != -2)
+            return gameover;
+        totalgames++;
         if (moveIndex >= 0)
         {
             children.emplace_back(board, -col);
@@ -70,7 +74,6 @@ int8_t Node::explore()
     }
     int8_t outcome = child->explore();
     lock_guard<mutex> lock(mtx);
-    totalgames++;
     wins += (outcome == col);
     return outcome;
 }
@@ -79,33 +82,23 @@ Node *Node::select()
 {
     float ucbmax = -INFINITY;
     Node *best = nullptr;
-    int total;
-    {
-        lock_guard<mutex> lock(mtx);
-        total = totalgames;
-    }
     for (auto &child : children)
     {
-        float ucb = child.UCB(total, col);
+        lock_guard<mutex> lock(child.mtx);
+        float ucb = child.UCB(totalgames, col);
         if (ucb > ucbmax)
         {
             ucbmax = ucb;
             best = &child;
+            gameover = best->gameover;
         }
-        else if (ucb == ucbmax && rand() % 2)
-        {
-            ucbmax = ucb;
-            best = &child;
-        }
+        else if (ucb == ucbmax)
+            if (rand() % 2)
+            {
+                ucbmax = ucb;
+                best = &child;
+            }
     }
-    if (best)
-    {
-        lock_guard<mutex> lock(mtx);
-        lock_guard<mutex> lock1(best->mtx);
-        gameover = best->gameover;
-    }
-    else
-        best = &children.front();
     return best;
 }
 //return best board

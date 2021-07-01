@@ -13,7 +13,6 @@ class Node
 {
 private:
     mutex mtx;
-    mutex child_mtx;
 
 public:
     int8_t col;

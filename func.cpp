@@ -247,22 +247,16 @@ bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t 
 }
 void printboard(array<int8_t, BoardSize> board, string name)
 {
-    string str = "./eyesore.py ";
-    str += to_string(EdgeSize) + " ";
-    for (int i = 0; i < BoardSize; i++)
-    {
-        str += to_string(board[i]);
-        str += ".";
-    }
-    str += " " + name;
+    string str = "./Storage/eyesore.py " + to_string(EdgeSize) + " " + name + " ";
+    for (int stone : board)
+        str += to_string(stone) + ".";
     char exe[str.length()];
     strcpy(exe, str.c_str());
     system(exe);
 }
 bool hasMove(array<int8_t, BoardSize> board, int8_t col)
 {
-    int8_t moveIndex = BoardSize - 1;
-    int8_t zero = 0;
+    int8_t moveIndex = BoardSize - 1, zero = 0;
     return newMove(board, col, zero, moveIndex);
 }
 //ret[0] = win color @ = 1 , O = -1

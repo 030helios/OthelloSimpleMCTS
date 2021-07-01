@@ -7,7 +7,7 @@ EdgeSize = int(sys.argv[1])
 
 img = np.full([EdgeSize, EdgeSize, 3], 90)
 i = 0
-for stone in sys.argv[2].split('.'):
+for stone in sys.argv[3].split('.'):
     if stone == '1':
         img[int(i/EdgeSize), i % EdgeSize, :] = 0
     elif stone == '-1':
@@ -26,4 +26,4 @@ img = cv2.copyMakeBorder(
     value=[50, 50, 50]
 )
 
-cv2.imwrite("Storage/"+sys.argv[3], img)
+cv2.imwrite("Storage/"+sys.argv[2], img)
