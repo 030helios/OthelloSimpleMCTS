@@ -26,4 +26,4 @@ img = cv2.copyMakeBorder(
     value=[50, 50, 50]
 )
 
-cv2.imwrite(sys.argv[3], img)
+cv2.imwrite("Storage/"+sys.argv[3], img)

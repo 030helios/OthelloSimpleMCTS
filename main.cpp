@@ -70,6 +70,9 @@ int main()
     cin >> timeLimit;
     //black
     int computerColor = 1;
+    int threadCount;
+    cout << "threadCount :";
+    cin >> threadCount;
 
     array<int8_t, BoardSize> board{};
     init(board);
@@ -82,11 +85,9 @@ int main()
     {
         cout << index << " round" << endl;
         printboard(board, to_string(index++) + name);
-        //default 8 thread
-        board = GetStep(board, timeLimit, 8, root);
+        board = GetStep(board, timeLimit, threadCount, root);
     }
     printboard(board, to_string(index++) + name);
     cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
-    cin >> timeLimit;
     return 0;
 }

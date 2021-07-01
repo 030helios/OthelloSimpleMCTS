@@ -1,6 +1,5 @@
 #include "func.h"
 #include "node.h"
-#include <iostream>
 using namespace std;
 
 Node::Node() {}
@@ -20,7 +19,7 @@ Node::Node(array<int8_t, BoardSize> &bd, int8_t co)
 //return UCB
 float Node::UCB(int &N, int8_t parentColor)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    lock_guard<mutex> lock(mtx);
     if (!totalgames)
         return 512;
     if (gameover != -2)
@@ -34,17 +33,19 @@ void Node::clean()
 {
     wins = 0;
     totalgames = 0;
-    int childsize = children.size();
     for (auto &child : children)
         child.clean();
 }
 int8_t Node::explore()
 {
-    if (gameover != -2)
-        return gameover;
-    Node *child = nullptr;
+    Node *child;
     {
-        std::lock_guard<std::mutex> lock(child_mtx);
+        lock_guard<mutex> lock(child_mtx);
+        {
+            lock_guard<mutex> lock(mtx);
+            if (gameover != -2)
+                return gameover;
+        }
         if (moveIndex >= 0)
         {
             children.emplace_back(board, -col);
@@ -58,7 +59,6 @@ int8_t Node::explore()
                 else if (!hasMove(board, -col))
                 { //won
                     children.pop_back();
-                    std::lock_guard<std::mutex> lock1(mtx);
                     gameover = 0;
                     for (auto stone : board)
                         gameover += stone;
@@ -70,9 +70,7 @@ int8_t Node::explore()
             child = select();
     }
     int8_t outcome = child->explore();
-    std::lock_guard<std::mutex> lock(mtx);
-    if (child->gameover == col || moveIndex < 0)
-        gameover = child->gameover;
+    lock_guard<mutex> lock(mtx);
     totalgames++;
     wins += (outcome == col);
     return outcome;
@@ -81,17 +79,34 @@ int8_t Node::explore()
 Node *Node::select()
 {
     float ucbmax = -INFINITY;
-    int total = totalgames;
     Node *best = nullptr;
+    int total;
+    {
+        lock_guard<mutex> lock(mtx);
+        total = totalgames;
+    }
     for (auto &child : children)
     {
         float ucb = child.UCB(total, col);
-        if (ucb > ucbmax || (ucb == ucbmax && rand() % 2))
+        if (ucb > ucbmax)
+        {
+            ucbmax = ucb;
+            best = &child;
+        }
+        else if (ucb == ucbmax && rand() % 2)
         {
             ucbmax = ucb;
             best = &child;
         }
     }
+    if (best)
+    {
+        lock_guard<mutex> lock(mtx);
+        lock_guard<mutex> lock1(best->mtx);
+        gameover = best->gameover;
+    }
+    else
+        best = &children.front();
     return best;
 }
 //return best board
@@ -111,24 +126,24 @@ Node *Node::getbest()
     for (int i = 0; i < imax; i++)
         children.pop_front();
     children.resize(1);
-    return &children[0];
+    return &children.front();
 }
 //returns child that matches the input
 Node *Node::playermove(array<int8_t, BoardSize> &target)
 {
-    children.push_back(*this);
-    while (children.size())
-        if (children[0].board != target)
-            children.pop_front();
-        else
-            break;
-    if (children.size() == 0)
+    if (target != board)
     {
-        printboard(board, "ErrorBoard");
-        printboard(target, "ErrorTarget");
-        int junk;
-        cin >> junk;
+        while (children.size())
+            if (children.front().board != target)
+                children.pop_front();
+            else
+            {
+                children.resize(1);
+                children.shrink_to_fit();
+                return &children[0];
+            }
     }
-    children.resize(1);
-    return &children[0];
+    if (children[0].board == target)
+        return &children[0];
+    return this;
 }
