@@ -1,18 +1,17 @@
 #ifndef __node_h__
 #define __node_h__
 #include "config"
-#include <mutex>
 #include <array>
 #include <deque>
 #include <math.h>
-#include <utility>
-#include <algorithm>
+#include <random>
+#include <semaphore.h>
 using namespace std;
 
 class Node
 {
 private:
-    mutex mtx;
+    sem_t sem;
 
 public:
     int8_t col;

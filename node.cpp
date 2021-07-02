@@ -2,19 +2,23 @@
 #include "node.h"
 using namespace std;
 
-Node::Node() {}
+Node::Node()
+{
+    sem_init(&sem, 0, 1);
+}
 Node::Node(const Node &t)
 {
     col = t.col;
     RdId = t.RdId;
     board = t.board;
+    sem_init(&sem, 0, 1);
 }
-//init as pass
 Node::Node(array<int8_t, BoardSize> &bd, int8_t co)
 {
     col = co;
     RdId = rand() % BoardSize;
     board = bd;
+    sem_init(&sem, 0, 1);
 }
 //return UCB
 float Node::UCB(int &N, int8_t parentColor)
@@ -46,7 +50,7 @@ int8_t Node::explore()
 {
     Node *child;
     {
-        lock_guard<mutex> lock(mtx);
+        sem_wait(&sem);
         if (gameover != -2)
             return gameover;
         totalgames++;
@@ -66,15 +70,18 @@ int8_t Node::explore()
                     for (auto stone : board)
                         gameover += stone;
                     gameover = (gameover > 0) - (gameover < 0);
+                    sem_post(&sem);
                     return gameover;
                 }
         }
         else
             child = select();
+        sem_post(&sem);
     }
     int8_t outcome = child->explore();
-    lock_guard<mutex> lock(mtx);
+    sem_wait(&sem);
     wins += (outcome == col);
+    sem_post(&sem);
     return outcome;
 }
 //return greatest UCB child number
@@ -84,7 +91,7 @@ Node *Node::select()
     Node *best = nullptr;
     for (auto &child : children)
     {
-        lock_guard<mutex> lock(child.mtx);
+        sem_wait(&child.sem);
         float ucb = child.UCB(totalgames, col);
         if (ucb > ucbmax)
         {
@@ -98,6 +105,7 @@ Node *Node::select()
                 ucbmax = ucb;
                 best = &child;
             }
+        sem_post(&child.sem);
     }
     return best;
 }

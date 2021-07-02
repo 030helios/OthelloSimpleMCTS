@@ -2,8 +2,8 @@
 #include "node.h"
 #include <time.h>
 #include <thread>
-#include <stdlib.h>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> RdMoves;
 
