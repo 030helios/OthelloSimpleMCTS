@@ -18,7 +18,7 @@ public:
     int8_t RdId;
     int8_t moveIndex = BoardSize - 1;
     int8_t gameover = -2;
-    int wins = 0;
+    int points = 0;
     int totalgames = 0;
     array<int8_t, BoardSize> board;
     deque<Node> children;

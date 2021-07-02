@@ -24,24 +24,22 @@ Node::Node(array<int8_t, BoardSize> &bd, int8_t co)
 float Node::UCB(int &N, int8_t parentColor)
 {
     if (gameover != -2)
-    {
-        if (gameover == 0)
-            if (!totalgames)
-                return 512;
-            else
-                return 1 / 2 + sqrt(2 * log(N) / (float)totalgames);
-        return 1024 * parentColor * gameover;
-    }
+        if (gameover != 0)
+            return 1024 * parentColor * gameover;
+        else if (totalgames)
+            return 0.5 + sqrt(2 * log(N) / (float)totalgames);
+        else
+            return 511;
     if (!totalgames)
         return 512;
     float a = sqrt(2 * log(N) / (float)totalgames);
-    a += ((float)(totalgames - wins) / (totalgames));
+    a += 0.5 + (float)(points) / (parentColor * 2 * totalgames);
     return a;
 }
 //removes data without removing the structure
 void Node::clean()
 {
-    wins = 0;
+    points = 0;
     totalgames = 0;
     for (auto &child : children)
         child.clean();
@@ -51,9 +49,12 @@ int8_t Node::explore()
     Node *child;
     {
         sem_wait(&sem);
-        if (gameover != -2)
-            return gameover;
         totalgames++;
+        if (gameover != -2)
+        {
+            sem_post(&sem);
+            return gameover;
+        }
         if (moveIndex >= 0)
         {
             children.emplace_back(board, -col);
@@ -80,7 +81,7 @@ int8_t Node::explore()
     }
     int8_t outcome = child->explore();
     sem_wait(&sem);
-    wins += (outcome == col);
+    points += outcome;
     sem_post(&sem);
     return outcome;
 }
@@ -112,21 +113,17 @@ Node *Node::select()
 //return best board
 Node *Node::getbest()
 {
-    int imax = 0;
-    for (int i = 0; i < children.size(); i++)
-    {
-        if (children[i].gameover == col)
-        {
-            imax = i;
-            break;
-        }
-        if (children[i].totalgames > children[imax].totalgames)
-            imax = i;
-    }
-    for (int i = 0; i < imax; i++)
+    Node *best = select();
+    for (auto &child : children)
+        if (child.totalgames > best->totalgames)
+            best = &child;
+    for (auto &child : children)
+        if (child.gameover == col)
+            best = &child;
+    while (&children.front() != best)
         children.pop_front();
     children.resize(1);
-    return &children.front();
+    return best;
 }
 //returns child that matches the input
 Node *Node::playermove(array<int8_t, BoardSize> &target)
