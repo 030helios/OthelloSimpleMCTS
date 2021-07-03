@@ -52,7 +52,7 @@ int8_t Node::explore()
     Node *child = nullptr;
     sem_wait(&sem);
     totalgames++;
-    if (gameover != -2)
+    if (gameover != -2 && gameover != 0)
     {
         sem_post(&sem);
         return gameover;
@@ -75,7 +75,7 @@ int8_t Node::explore()
     int8_t outcome = child->explore();
     sem_wait(&sem);
     points += outcome;
-    if (gameover != -2)
+    if (gameover != -2 && gameover != 0)
     {
         outcome = totalgames * gameover - points;
         points = gameover * totalgames;
@@ -109,7 +109,7 @@ Node *Node::select()
 //return best board
 Node *Node::getbest()
 {
-    Node *best = select();
+    Node *best = &children.front();
     for (auto &child : children)
         if (child.totalgames > best->totalgames)
             best = &child;

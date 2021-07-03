@@ -17,9 +17,9 @@ void Countdown(time_t timeLimit, Node *root)
 
 array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime, int threadCount, Node *&root)
 {
-    time_t timeLimit = time(0) + thinkTime;
     root = root->playermove(board);
     root->clean();
+    time_t timeLimit = time(0) + thinkTime;
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
@@ -29,16 +29,16 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
         threadvec[i].join();
 
     cout << "Total playouts: " << root->totalgames << endl;
-    if (root->gameover == -2)
+    if (root->gameover == -2 || root->gameover == 0)
     {
+        if (root->gameover == 0)
+            cout << "Maybe Draw\n";
         cout << (root->col == 1 ? "Black " : "White ");
         root = root->getbest();
         float childUtility = float(root->points * root->col) / (2 * root->totalgames);
         cout << "winrate estimate: " << 0.5 - childUtility << endl;
         return root->board;
     }
-    else if (root->gameover == 0)
-        cout << "Draw\n";
     else
         cout << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
     root = root->getbest();
