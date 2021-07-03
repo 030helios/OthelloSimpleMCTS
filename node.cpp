@@ -6,18 +6,12 @@ Node::Node()
 {
     sem_init(&sem, 0, 1);
 }
-Node::Node(const Node &t)
+Node::Node(const Node &t) : col(t.col), RdId(t.RdId), board(t.board)
 {
-    col = t.col;
-    RdId = t.RdId;
-    board = t.board;
     sem_init(&sem, 0, 1);
 }
-Node::Node(array<int8_t, BoardSize> &bd, int8_t co)
+Node::Node(array<int8_t, BoardSize> &bd, int8_t co) : col(co), RdId(rand() % BoardSize), board(bd)
 {
-    col = co;
-    RdId = rand() % BoardSize;
-    board = bd;
     sem_init(&sem, 0, 1);
 }
 //return UCB
@@ -25,13 +19,9 @@ float Node::UCB(int &N, int8_t parentColor)
 {
     if (gameover != -2)
         if (gameover != 0)
-            return 1024 * parentColor * gameover;
-        else if (totalgames)
-            return 0.5 + sqrt(2 * log(N) / (float)totalgames);
+            return N * parentColor * gameover;
         else
-            return 511;
-    if (!totalgames)
-        return 512;
+            return 0.5 + sqrt(2 * log(N) / (float)totalgames);
     float a = sqrt(2 * log(N) / (float)totalgames);
     a += 0.5 + (float)(points) / (parentColor * 2 * totalgames);
     return a;
@@ -44,48 +34,55 @@ void Node::clean()
     for (auto &child : children)
         child.clean();
 }
+Node *Node::getNewChild()
+{
+    children.emplace_back(board, -col);
+    if (newMove(children.back().board, col, RdId, moveIndex))
+        return &children.back();
+    else if (children.size() > 1) // has children
+        children.pop_back();
+    else if (!hasMove(board, -col)) //won
+        children.pop_back();
+    else //pass
+        return &children.back();
+    return nullptr;
+}
 int8_t Node::explore()
 {
-    Node *child;
+    Node *child = nullptr;
+    sem_wait(&sem);
+    totalgames++;
+    if (gameover != -2)
     {
-        sem_wait(&sem);
-        totalgames++;
-        if (gameover != -2)
-        {
-            sem_post(&sem);
-            return gameover;
-        }
-        if (moveIndex >= 0)
-        {
-            children.emplace_back(board, -col);
-            child = &children.back();
-            if (!newMove(children.back().board, col, RdId, moveIndex)) //searched
-                if (children.size() > 1)
-                { // has children
-                    children.pop_back();
-                    child = select();
-                }
-                else if (!hasMove(board, -col))
-                { //won
-                    gameover = 0;
-                    for (auto stone : board)
-                        gameover += stone;
-                    gameover = (gameover > 0) - (gameover < 0);
-                    sem_post(&sem);
-                    return gameover;
-                }
-        }
-        else
-            child = select();
         sem_post(&sem);
+        return gameover;
     }
+    if (moveIndex >= 0)
+        child = getNewChild();
+    if (child == nullptr)
+        child = select();
+    if (child == nullptr)
+    { //won
+        gameover = 0;
+        for (auto stone : board)
+            gameover += stone;
+        gameover = (gameover > 0) - (gameover < 0);
+        sem_post(&sem);
+        return gameover;
+    }
+    sem_post(&sem);
+
     int8_t outcome = child->explore();
     sem_wait(&sem);
     points += outcome;
+    if (gameover != -2)
+    {
+        outcome = totalgames * gameover - points;
+        points = gameover * totalgames;
+    }
     sem_post(&sem);
     return outcome;
 }
-//return greatest UCB child number
 Node *Node::select()
 {
     float ucbmax = -INFINITY;
@@ -93,6 +90,11 @@ Node *Node::select()
     for (auto &child : children)
     {
         sem_wait(&child.sem);
+        if (child.totalgames == 0)
+        {
+            sem_post(&child.sem);
+            return &child;
+        }
         float ucb = child.UCB(totalgames, col);
         if (ucb > ucbmax)
         {
@@ -100,12 +102,6 @@ Node *Node::select()
             best = &child;
             gameover = best->gameover;
         }
-        else if (ucb == ucbmax)
-            if (rand() % 2)
-            {
-                ucbmax = ucb;
-                best = &child;
-            }
         sem_post(&child.sem);
     }
     return best;

@@ -31,6 +31,7 @@ public:
 
     void clean();
 
+    Node *getNewChild();
     int8_t explore();
     Node *select();
     Node *getbest();

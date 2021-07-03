@@ -33,8 +33,8 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
     {
         cout << (root->col == 1 ? "Black " : "White ");
         root = root->getbest();
-        float winrate = float(root->points) / (2 * root->totalgames) + 0.5;
-        cout << "winrate estimate: " << 1 - winrate << endl;
+        float childUtility = float(root->points * root->col) / (2 * root->totalgames);
+        cout << "winrate estimate: " << 0.5 - childUtility << endl;
         return root->board;
     }
     else if (root->gameover == 0)
