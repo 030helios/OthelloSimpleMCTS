@@ -238,7 +238,7 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
 //Returns true if we made a move
 bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex)
 {
-    array<pair<int8_t, int8_t>, BoardSize> &MoveArr = RdMoves[RdId];
+    array<pair<int8_t, int8_t>, BoardSize> &MoveArr = shuffledMoves[RdId];
     while (!tryMove(board, col, MoveArr[moveIndex].first, MoveArr[moveIndex].second))
         if (--moveIndex < 0)
             return false;

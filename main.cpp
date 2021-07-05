@@ -7,30 +7,29 @@
 using namespace std;
 using namespace chrono;
 
-array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> RdMoves;
+// Default heat value for root exploration.
+// Depends on clock rate, thinkTime and threadCount. Which leaves room for improvement.
+float depth;
 
 //continue exploring until time up
-void Countdown(system_clock::time_point timeLimit, Node *root, int threadcount)
+void Countdown(system_clock::time_point start, milliseconds thinkTime, Node *root, int threadcount)
 {
-    milliseconds timeleft = duration_cast<milliseconds>(timeLimit - system_clock::now());
-    while (timeleft.count() > 0)
+    milliseconds timepast = duration_cast<milliseconds>(system_clock::now() - start);
+    while (timepast < thinkTime)
     {
-        root->explore(round(log(timeleft.count() * threadcount) / log(EdgeSize) + 0.5));
-        timeleft = timeleft = duration_cast<milliseconds>(timeLimit - system_clock::now());
+        root->explore(round(depth - log(timepast.count() * threadcount) / log(EdgeSize)));
+        timepast = duration_cast<milliseconds>(system_clock::now() - start);
     }
-    return;
 }
 
 array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime, int threadCount, Node *&root)
 {
     root = root->playermove(board);
     root->clean();
-    system_clock::time_point timeLimit = system_clock::now() + seconds(thinkTime);
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
-        threadvec.emplace_back(Countdown, timeLimit, root, threadCount);
-    //after 5 seconds
+        threadvec.emplace_back(Countdown, system_clock::now(), seconds(thinkTime), root, threadCount);
     for (int i = 0; i < threadCount; i++)
         threadvec[i].join();
 
@@ -46,11 +45,15 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
         return root->board;
     }
     else
+    {
+        thinkTime = 0;
         cout << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
+    }
     root = root->getbest();
     return root->board;
 }
-
+//An array of shuffled arrays filled with indexes
+array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> shuffledMoves;
 void init(array<int8_t, BoardSize> &board)
 {
     int d = EdgeSize / 2 + EdgeSize * EdgeSize / 2;
@@ -58,16 +61,15 @@ void init(array<int8_t, BoardSize> &board)
     board[d - 1] = -1;
     board[d - EdgeSize] = -1;
     board[d - EdgeSize - 1] = 1;
-    time_t now = system_clock::to_time_t(system_clock::now());
-    srand(now);
+    srand(system_clock::to_time_t(system_clock::now()));
     array<pair<int8_t, int8_t>, BoardSize> defaultMoves;
     for (int i = 0; i < EdgeSize; i++)
         for (int j = 0; j < EdgeSize; j++)
             defaultMoves[i * EdgeSize + j] = make_pair(i, j);
-    for (auto &bd : RdMoves)
-        bd = defaultMoves;
-    for (auto &bd : RdMoves)
-        random_shuffle(bd.begin(), bd.end());
+    for (auto &moves : shuffledMoves)
+        moves = defaultMoves;
+    for (auto &moves : shuffledMoves)
+        random_shuffle(moves.begin(), moves.end());
 }
 
 int main()
@@ -79,6 +81,8 @@ int main()
     cin >> timeLimit;
     cout << "ThreadCount :";
     cin >> threadCount;
+
+    depth = log(timeLimit * 1000 * threadCount) / log(EdgeSize) + 0.5;
 
     array<int8_t, BoardSize> board{};
     init(board);
