@@ -1,21 +1,22 @@
 #include "func.h"
 #include "node.h"
-#include <time.h>
+#include <chrono>
 #include <thread>
 #include <iostream>
 #include <algorithm>
 using namespace std;
+using namespace chrono;
 
 array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> RdMoves;
 
 //continue exploring until time up
-void Countdown(time_t timeLimit, Node *root, int threadcount)
+void Countdown(system_clock::time_point timeLimit, Node *root, int threadcount)
 {
-    int timeleft = timeLimit - time(0);
-    while (timeleft)
+    milliseconds timeleft = duration_cast<milliseconds>(timeLimit - system_clock::now());
+    while (timeleft.count() > 0)
     {
-        root->explore(round(log(timeleft * threadcount) + 0.5));
-        timeleft = timeLimit - time(0);
+        root->explore(round(log(timeleft.count() * threadcount) / log(EdgeSize) + 0.5));
+        timeleft = timeleft = duration_cast<milliseconds>(timeLimit - system_clock::now());
     }
     return;
 }
@@ -24,7 +25,7 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
 {
     root = root->playermove(board);
     root->clean();
-    time_t timeLimit = time(0) + thinkTime;
+    system_clock::time_point timeLimit = system_clock::now() + seconds(thinkTime);
     //initialize thread
     vector<thread> threadvec;
     for (int i = 0; i < threadCount; i++)
@@ -57,7 +58,8 @@ void init(array<int8_t, BoardSize> &board)
     board[d - 1] = -1;
     board[d - EdgeSize] = -1;
     board[d - EdgeSize - 1] = 1;
-    srand(time(0));
+    time_t now = system_clock::to_time_t(system_clock::now());
+    srand(now);
     array<pair<int8_t, int8_t>, BoardSize> defaultMoves;
     for (int i = 0; i < EdgeSize; i++)
         for (int j = 0; j < EdgeSize; j++)
