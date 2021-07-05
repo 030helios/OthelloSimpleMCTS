@@ -145,7 +145,7 @@ int downleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
     }
     return 0;
 }
-
+//Attempts a move on the position x,y. Returns true and changes the board if such move is legal.
 bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
 {
     if (board[x * EdgeSize + y] != 0)
@@ -235,7 +235,7 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
         board[x * EdgeSize + y] = col;
     return touched;
 }
-//return true if we made a move
+//Returns true if we made a move
 bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex)
 {
     array<pair<int8_t, int8_t>, BoardSize> &MoveArr = RdMoves[RdId];
@@ -245,9 +245,28 @@ bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t 
     moveIndex--;
     return true;
 }
+//Makes random moves, returns the outcome of the game
+int playout(array<int8_t, BoardSize> board, int8_t col)
+{
+    while (1)
+    {
+        int8_t rdid = rand() % BoardSize;
+        int8_t moveInd = BoardSize - 1;
+        if (!newMove(board, col, rdid, moveInd))
+            if (!hasMove(board, -col))
+                break;
+        col = -col;
+    }
+    int ret = 0;
+    for (auto stone : board)
+        ret += stone;
+    ret = (ret > 0) - (ret < 0);
+    return ret;
+}
+//Saves the board in /Storage
 void printboard(array<int8_t, BoardSize> board, string name)
 {
-    string str = "./Storage/eyesore.py " + to_string(EdgeSize) + " " + name + " ";
+    string str = "./Storage/eyesore.py " + to_string(EdgeSize) + " " + name + ".jpg ";
     for (int stone : board)
         str += to_string(stone) + ".";
     char exe[str.length()];

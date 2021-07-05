@@ -23,13 +23,13 @@ float Node::UCB(int &N, int8_t parentColor)
         else
             return 0.5 + sqrt(2 * log(N) / (float)totalgames);
     float a = sqrt(2 * log(N) / (float)totalgames);
-    a += 0.5 + (float)(points) / (parentColor * 2 * totalgames);
+    a += 0.5 + (float)(score) / (parentColor * 2 * totalgames);
     return a;
 }
 //removes data without removing the structure
 void Node::clean()
 {
-    points = 0;
+    score = 0;
     totalgames = 0;
     for (auto &child : children)
         child.clean();
@@ -47,7 +47,8 @@ Node *Node::getNewChild()
         return &children.back();
     return nullptr;
 }
-int8_t Node::explore()
+//Heat determines whether to allocate new child or not
+int Node::explore(int8_t heat)
 {
     Node *child = nullptr;
     sem_wait(&sem);
@@ -57,8 +58,18 @@ int8_t Node::explore()
         sem_post(&sem);
         return gameover;
     }
+    if (heat == 0)
+    {
+        int outcome = playout(board, col);
+        score += outcome;
+        sem_post(&sem);
+        return outcome;
+    }
     if (moveIndex >= 0)
+    {
+        heat -= 1;
         child = getNewChild();
+    }
     if (child == nullptr)
         child = select();
     if (child == nullptr)
@@ -72,13 +83,13 @@ int8_t Node::explore()
     }
     sem_post(&sem);
 
-    int8_t outcome = child->explore();
+    int outcome = child->explore(heat);
     sem_wait(&sem);
-    points += outcome;
+    score += outcome;
     if (gameover != -2 && gameover != 0)
     {
-        outcome = totalgames * gameover - points;
-        points = gameover * totalgames;
+        outcome = totalgames * gameover - score;
+        score = gameover * totalgames;
     }
     sem_post(&sem);
     return outcome;

@@ -18,7 +18,7 @@ public:
     int8_t RdId;
     int8_t moveIndex = BoardSize - 1;
     int8_t gameover = -2;
-    int points = 0;
+    int score = 0;
     int totalgames = 0;
     array<int8_t, BoardSize> board;
     deque<Node> children;
@@ -32,7 +32,7 @@ public:
     void clean();
 
     Node *getNewChild();
-    int8_t explore();
+    int explore(int8_t heat);
     Node *select();
     Node *getbest();
     Node *playermove(array<int8_t, BoardSize> &target);

@@ -21,6 +21,8 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y);
 
 bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex);
 
+int playout(array<int8_t, BoardSize> board, int8_t col);
+
 void printboard(array<int8_t, BoardSize> board, string name);
 
 bool hasMove(array<int8_t, BoardSize> board, int8_t col);
