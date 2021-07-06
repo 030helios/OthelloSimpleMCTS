@@ -20,11 +20,11 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j);
 
 bool newMove(array<int8_t, BoardSize> &board, int8_t col, int8_t RdId, int8_t &moveIndex);
 
+bool hasMove(array<int8_t, BoardSize> board, int8_t col);
+
 int score(array<int8_t, BoardSize> &board);
 
 int playout(array<int8_t, BoardSize> board, int8_t col);
 
 void printboard(array<int8_t, BoardSize> board, string name);
-
-bool hasMove(array<int8_t, BoardSize> board, int8_t col);
 #endif
