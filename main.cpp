@@ -2,6 +2,7 @@
 #include "node.h"
 #include <chrono>
 #include <thread>
+#include <vector>
 #include <iostream>
 #include <algorithm>
 using namespace std;
@@ -40,7 +41,7 @@ array<int8_t, BoardSize> GetStep(array<int8_t, BoardSize> board, int &thinkTime,
             cout << "Maybe Draw\n";
         cout << (root->col == 1 ? "Black " : "White ");
         root = root->getbest();
-        float childUtility = float(root->score * root->col) / (2 * root->totalgames);
+        float childUtility = float(root->totalScore * root->col) / (2 * root->totalgames);
         cout << "winrate estimate: " << 0.5 - childUtility << endl;
         return root->board;
     }
@@ -91,13 +92,13 @@ int main()
     Node *root = &Source;
     string ImgName = "Output_";
     int index = 0;
-    while (won(board)[1] == 0)
+    while (hasMove(board, 1) || hasMove(board, -1))
     {
         cout << "Round " << index << endl;
         printboard(board, ImgName + to_string(index++));
         board = GetStep(board, timeLimit, threadCount, root);
     }
     printboard(board, ImgName + to_string(index++));
-    cout << "Winner: " << (won(board)[0] == 1 ? "Black" : "White") << endl;
+    cout << "Winner: " << (score(board) == 1 ? "Black" : "White") << endl;
     return 0;
 }

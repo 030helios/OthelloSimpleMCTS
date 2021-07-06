@@ -5,20 +5,20 @@
 #include <deque>
 #include <math.h>
 #include <random>
-#include <mutex>
+#include <semaphore.h>
 using namespace std;
 
 class Node
 {
 private:
-    mutex mtx;
+    sem_t sem;
 
 public:
     int8_t col;
     int8_t RdId;
     int8_t moveIndex = BoardSize - 1;
     int8_t gameover = -2;
-    int score = 0;
+    int totalScore = 0;
     int totalgames = 0;
     array<int8_t, BoardSize> board;
     deque<Node> children;
@@ -29,7 +29,7 @@ public:
     void clean();
 
     Node *getNewChild();
-    float UCB(int &N, int8_t co);
+    float UCB(int N, int8_t co);
     Node *select();
 
     int explore(int8_t heat);

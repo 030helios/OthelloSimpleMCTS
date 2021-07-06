@@ -1,13 +1,18 @@
 #include "func.h"
 #include "node.h"
 using namespace std;
-
-Node::Node() {}
-Node::Node(array<int8_t, BoardSize> &bd, int8_t co) : col(co), RdId(rand() % BoardSize), board(bd) {}
+Node::Node()
+{
+    sem_init(&sem, 0, 1);
+}
+Node::Node(array<int8_t, BoardSize> &bd, int8_t co) : col(co), RdId(rand() % BoardSize), board(bd)
+{
+    sem_init(&sem, 0, 1);
+}
 //removes data without removing the structure
 void Node::clean()
 {
-    score = 0;
+    totalScore = 0;
     totalgames = 0;
     for (auto &child : children)
         child.clean();
@@ -26,7 +31,7 @@ Node *Node::getNewChild()
         return &children.back();
     return nullptr;
 }
-float Node::UCB(int &N, int8_t parentColor)
+float Node::UCB(int N, int8_t parentColor)
 {
     if (gameover != -2)
         if (gameover != 0)
@@ -34,7 +39,7 @@ float Node::UCB(int &N, int8_t parentColor)
         else
             return 0.5 + sqrt(2 * log(N) / (float)totalgames);
     float a = sqrt(2 * log(N) / (float)totalgames);
-    a += 0.5 + (float)(score) / (parentColor * 2 * totalgames);
+    a += 0.5 + (float)(totalScore) / (parentColor * 2 * totalgames);
     return a;
 }
 //returns child with greatest UCB
@@ -44,9 +49,12 @@ Node *Node::select()
     Node *best = nullptr;
     for (auto &child : children)
     {
-        lock_guard<mutex> lock(child.mtx);
+        sem_wait(&child.sem);
         if (child.totalgames == 0)
+        {
+            sem_post(&child.sem);
             return &child;
+        }
         float ucb = child.UCB(totalgames, col);
         if (ucb > ucbmax)
         {
@@ -54,6 +62,7 @@ Node *Node::select()
             best = &child;
             gameover = best->gameover;
         }
+        sem_post(&child.sem);
     }
     return best;
 }
@@ -61,40 +70,41 @@ Node *Node::select()
 int Node::explore(int8_t heat)
 {
     Node *child = nullptr;
-    {
-        lock_guard<mutex> lock(mtx);
-        totalgames++;
-        if (gameover != -2 && gameover != 0)
-            return gameover;
-        if (heat == 0)
-        {
-            score = playout(board, col);
-            return score;
-        }
-        if (moveIndex >= 0)
-            child = getNewChild();
-        if (child == nullptr)
-            child = select();
-        else
-            heat--;
-        if (child == nullptr)
-        { //won
-            gameover = 0;
-            for (auto stone : board)
-                gameover += stone;
-            gameover = (gameover > 0) - (gameover < 0);
-            return gameover;
-        }
-    }
-    int outcome = child->explore(heat);
-
-    lock_guard<mutex> lock(mtx);
-    score += outcome;
+    sem_wait(&sem);
+    totalgames++;
     if (gameover != -2 && gameover != 0)
     {
-        outcome = totalgames * gameover - score;
-        score = gameover * totalgames;
+        sem_post(&sem);
+        return gameover;
     }
+    if (heat == 0)
+    {
+        totalScore = playout(board, col);
+        sem_post(&sem);
+        return totalScore;
+    }
+    if (moveIndex >= 0)
+        child = getNewChild();
+    if (child == nullptr)
+        child = select();
+    else
+        heat--;
+    if (child == nullptr)
+    { //won
+        gameover = score(board);
+        sem_post(&sem);
+        return gameover;
+    }
+    sem_post(&sem);
+    int outcome = child->explore(heat);
+    sem_wait(&sem);
+    totalScore += outcome;
+    if (gameover != -2 && gameover != 0)
+    {
+        outcome = totalgames * gameover - totalScore;
+        totalScore = gameover * totalgames;
+    }
+    sem_post(&sem);
     return outcome;
 }
 //returns the most visited child node

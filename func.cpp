@@ -1,242 +1,178 @@
 #include "func.h"
 using namespace std;
 
-int toleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void tryleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (j > 1)
-    {
-        int between = 0; //if here's stuff between new location and left location
-        for (j--; j >= 0; j--)
+    if (j <= 1)
+        return;
+    int flip = 0; //the amount of stones we flip
+    for (j--; j >= 0; j--)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[i * EdgeSize + ++j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int toright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void tryright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (j < (EdgeSize - 2))
-    {
-        int between = 0; //if here's stuff between new location and left location
-        for (j++; j < EdgeSize; j++)
+    if (j >= (EdgeSize - 2))
+        return;
+    int flip = 0; //the amount of stones we flip
+    for (j++; j < EdgeSize; j++)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[i * EdgeSize + --j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int toup(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void tryup(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i > 1)
-    {
-        int between = 0; //if here's stuff between new location and left location
-        for (i--; i >= 0; i--)
+    if (i <= 1)
+        return;
+    int flip = 0; //the amount of stones we flip
+    for (i--; i >= 0; i--)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[++i * EdgeSize + j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int todown(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void trydown(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i < (EdgeSize - 2))
-    {
-        int between = 0; //if here's stuff between new location and left location
-        for (i++; i < EdgeSize; i++)
+    if (i >= (EdgeSize - 2))
+        return;
+    int flip = 0; //the amount of stones we flip
+    for (i++; i < EdgeSize; i++)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[--i * EdgeSize + j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int upright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void upright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i > 1 && j < (EdgeSize - 2))
-    {
-        int between = 0; //if here's stuff between new location and left location
-        while (i > 0 && j < (EdgeSize - 1))
+    if (i <= 1 || j >= (EdgeSize - 2))
+        return;
+    int flip = 0; //the amount of stones we flip
+    while (i-- > 0 && j++ < (EdgeSize - 1))
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            i--;
-            j++;
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[++i * EdgeSize + --j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int upleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void upleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i > 1 && j > 1)
-    {
-        int between = 0; //if here's stuff between new location and left location
-        while (i > 0 && j > 0)
+    if (i <= 1 || j <= 1)
+        return;
+    int flip = 0; //the amount of stones we flip
+    while (i-- > 0 && j-- > 0)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            i--;
-            j--;
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[++i * EdgeSize + ++j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int downright(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void downright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i < (EdgeSize - 2) && j < (EdgeSize - 2))
-    {
-        int between = 0; //if here's stuff between new location and left location
-        while (i < (EdgeSize - 1) && j < (EdgeSize - 1))
+    if (i >= (EdgeSize - 2) || j >= (EdgeSize - 2))
+        return;
+    int flip = 0; //the amount of stones we flip
+    while (i++ < (EdgeSize - 1) && j++ < (EdgeSize - 1))
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            i++;
-            j++;
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[--i * EdgeSize + --j] = col;
+            return;
         }
-    }
-    return 0;
 }
-int downleft(array<int8_t, BoardSize> &board, int8_t &col, int i, int j)
+void downleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
 {
-    if (i < (EdgeSize - 2) && j > 1)
-    {
-        int between = 0; //if here's stuff between new location and left location
-        while (i < (EdgeSize - 1) && j > 0)
+    if (i >= (EdgeSize - 2) || j <= 1)
+        return;
+    int flip = 0; //the amount of stones we flip
+    while (i++ < (EdgeSize - 1) && j-- > 0)
+        if (board[i * EdgeSize + j] == 0)
+            return;
+        else if (board[i * EdgeSize + j] == -col)
+            flip++;
+        else if (board[i * EdgeSize + j] == col)
         {
-            i++;
-            j--;
-            if (board[i * EdgeSize + j] == 0)
-                return 0;
-            else if (board[i * EdgeSize + j] == -col)
-                between++;
-            else if (board[i * EdgeSize + j] == col)
-                return between;
+            if (flip)
+                legal = true;
+            while (flip--)
+                board[--i * EdgeSize + ++j] = col;
+            return;
         }
-    }
-    return 0;
 }
-//Attempts a move on the position x,y. Returns true and changes the board if such move is legal.
-bool tryMove(array<int8_t, BoardSize> &board, int8_t &col, int x, int y)
+//Attempts a move on the position i,j. Returns true and changes the board if such move is legal.
+bool tryMove(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j)
 {
-    if (board[x * EdgeSize + y] != 0)
+    if (board[i * EdgeSize + j] != 0)
         return false;
-    bool touched = false;
-    int dis = toleft(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        for (int j = y - 1; j != y - 1 - dis; j--)
-            board[x * EdgeSize + j] = col;
-    }
-    dis = toright(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        for (int j = y + 1; j != y + 1 + dis; j++)
-            board[x * EdgeSize + j] = col;
-    }
-    dis = toup(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        for (int i = x - 1; i != x - 1 - dis; i--)
-            board[i * EdgeSize + y] = col;
-    }
-    dis = todown(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        for (int i = x + 1; i != x + 1 + dis; i++)
-            board[i * EdgeSize + y] = col;
-    }
-    dis = upright(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        int i = x;
-        int j = y;
-        while (i != x - dis)
-        {
-            i--;
-            j++;
-            board[i * EdgeSize + j] = col;
-        }
-    }
-    dis = upleft(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        int i = x;
-        int j = y;
-        while (i != x - dis)
-        {
-            i--;
-            j--;
-            board[i * EdgeSize + j] = col;
-        }
-    }
-    dis = downright(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        int i = x;
-        int j = y;
-        while (i != x + dis)
-        {
-            i++;
-            j++;
-            board[i * EdgeSize + j] = col;
-        }
-    }
-    dis = downleft(board, col, x, y);
-    if (dis)
-    {
-        touched = true;
-        int i = x;
-        int j = y;
-        while (i != x + dis)
-        {
-            i++;
-            j--;
-            board[i * EdgeSize + j] = col;
-        }
-    }
-    if (touched)
-        board[x * EdgeSize + y] = col;
-    return touched;
+    bool legal = false;
+    tryleft(board, col, i, j, legal);
+    tryright(board, col, i, j, legal);
+    tryup(board, col, i, j, legal);
+    trydown(board, col, i, j, legal);
+    upright(board, col, i, j, legal);
+    upleft(board, col, i, j, legal);
+    downright(board, col, i, j, legal);
+    downleft(board, col, i, j, legal);
+    if (legal)
+        board[i * EdgeSize + j] = col;
+    return legal;
 }
 //Returns true if we made a move
-bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t &moveIndex)
+bool newMove(array<int8_t, BoardSize> &board, int8_t col, int8_t RdId, int8_t &moveIndex)
 {
     array<pair<int8_t, int8_t>, BoardSize> &MoveArr = shuffledMoves[RdId];
     while (!tryMove(board, col, MoveArr[moveIndex].first, MoveArr[moveIndex].second))
@@ -245,23 +181,26 @@ bool newMove(array<int8_t, BoardSize> &board, int8_t &col, int8_t &RdId, int8_t 
     moveIndex--;
     return true;
 }
-//Makes random moves, returns the outcome of the game
-int playout(array<int8_t, BoardSize> board, int8_t col)
+int score(array<int8_t, BoardSize> &board)
 {
-    while (1)
-    {
-        int8_t rdid = rand() % BoardSize;
-        int8_t moveInd = BoardSize - 1;
-        if (!newMove(board, col, rdid, moveInd))
-            if (!hasMove(board, -col))
-                break;
-        col = -col;
-    }
     int ret = 0;
     for (auto stone : board)
         ret += stone;
     ret = (ret > 0) - (ret < 0);
     return ret;
+}
+//Makes random moves, returns the outcome of the game
+int playout(array<int8_t, BoardSize> board, int8_t col)
+{
+    while (1)
+    {
+        int8_t moveInd = BoardSize - 1;
+        if (!newMove(board, col, rand() % BoardSize, moveInd))
+            if (!hasMove(board, -col))
+                break;
+        col = -col;
+    }
+    return score(board);
 }
 //Saves the board in /Storage
 void printboard(array<int8_t, BoardSize> board, string name)
@@ -275,21 +214,6 @@ void printboard(array<int8_t, BoardSize> board, string name)
 }
 bool hasMove(array<int8_t, BoardSize> board, int8_t col)
 {
-    int8_t moveIndex = BoardSize - 1, zero = 0;
-    return newMove(board, col, zero, moveIndex);
-}
-//ret[0] = win color @ = 1 , O = -1
-//ret[1] = game finished or not
-vector<int> won(array<int8_t, BoardSize> &board)
-{
-    vector<int> ret{0, 0};
-    if (!hasMove(board, 1))
-        if (!hasMove(board, -1))
-        {
-            ret[1] = 1;
-            for (auto stone : board)
-                ret[0] += stone;
-            ret[0] = (ret[0] > 0) - (ret[0] < 0);
-        }
-    return ret;
+    int8_t moveIndex = BoardSize - 1;
+    return newMove(board, col, 0, moveIndex);
 }
