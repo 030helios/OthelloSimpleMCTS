@@ -19,7 +19,7 @@ public:
     int8_t moveIndex = BoardSize - 1;
     int8_t gameover = -2;
     int totalScore = 0;
-    int totalgames = 0;
+    int totalGames = 0;
     array<int8_t, BoardSize> board;
     deque<Node> children;
 
@@ -33,8 +33,5 @@ public:
     Node *select();
 
     int explore(int8_t heat);
-
-    Node *getbest();
-    Node *playermove(array<int8_t, BoardSize> &target);
 };
 #endif

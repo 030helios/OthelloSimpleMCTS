@@ -2,7 +2,6 @@
 #define __func_h__
 #include "config"
 #include <array>
-#include <cstring>
 using namespace std;
 
 extern array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> shuffledMoves;
@@ -25,6 +24,4 @@ bool hasMove(array<int8_t, BoardSize> board, int8_t col);
 int score(array<int8_t, BoardSize> &board);
 
 int playout(array<int8_t, BoardSize> board, int8_t col);
-
-void printboard(array<int8_t, BoardSize> board, string name);
 #endif

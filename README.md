@@ -1,9 +1,8 @@
 # OthelloSimpleMCTS
 Simple multithread MCTS Othello bot. Aim for performance with simplicity in mind.
 
-Sacrifices randomness for speed.
+The size of the board can vary. Recompile after config change
 
-Maintains search tree structure throughout the game.
-Automatically minmax last game nodes.
+Sacrifices randomness for extra speed. Mixed in some minmax.
 
-Gobbles RAM like a boss.
+Maintains decent balance between RAM usage and tree structure.

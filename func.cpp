@@ -199,13 +199,3 @@ int playout(array<int8_t, BoardSize> board, int8_t col)
     }
     return score(board);
 }
-//Saves the board in /Storage
-void printboard(array<int8_t, BoardSize> board, string name)
-{
-    string str = "./Storage/eyesore.py " + to_string(EdgeSize) + " " + name + ".jpg ";
-    for (int stone : board)
-        str += to_string(stone) + ".";
-    char exe[str.length()];
-    strcpy(exe, str.c_str());
-    system(exe);
-}
