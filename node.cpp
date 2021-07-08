@@ -25,7 +25,7 @@ Node *Node::getNewChild()
     Node child(board, -col);
     if (newMove(child.board, col, RdId, moveIndex))
         children.push_back(child);
-    else if (children.size() > 1) // has children
+    else if (children.size() > 0) // has children
         return nullptr;
     else if (!hasMove(board, -col)) //won
         return nullptr;
