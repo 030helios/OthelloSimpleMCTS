@@ -6,8 +6,9 @@ Node::Node()
 {
     sem_init(&sem, 0, 1);
 }
-Node::Node(array<int8_t, BoardSize> &bd, int8_t co) : col(co), RdId(rand() % BoardSize), board(bd)
+Node::Node(int8_t *bd, int8_t co) : col(co), RdId(rand() % BoardSize)
 {
+    copy(bd, bd + BoardSize, board);
     sem_init(&sem, 0, 1);
 }
 //removes data without removing the structure
@@ -61,7 +62,7 @@ Node *Node::select()
         {
             ucbmax = ucb;
             best = &child;
-            gameover = best->gameover;
+            gameover = child.gameover;
         }
         sem_post(&child.sem);
     }
@@ -90,8 +91,8 @@ int Node::explore(int8_t heat)
         child = select();
     else
         heat--;
-    if (child == nullptr)
-    { //won
+    if (child == nullptr) //won
+    {
         gameover = score(board);
         sem_post(&sem);
         return gameover;

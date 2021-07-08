@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 #include <vector>
+#include <cstdint>
 using namespace std;
 using namespace chrono;
 
@@ -22,11 +23,11 @@ class Bot
     static void countdown(system_clock::time_point start, milliseconds thinkTime, Node *root, float depth, int threadCount);
 
     void move();
-    void enemyMove(array<int8_t, BoardSize> &target);
+    void enemyMove(int8_t target[BoardSize]);
 
 public:
     ~Bot();
-    Bot(int timeLimit, int threadCount, array<int8_t, BoardSize> board, int8_t color);
-    array<int8_t, BoardSize> play(array<int8_t, BoardSize> board);
+    Bot(int timeLimit, int threadCount, int8_t board[BoardSize], int8_t color);
+    int8_t *play(int8_t board[BoardSize]);
 };
 #endif

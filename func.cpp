@@ -1,7 +1,9 @@
 #include "func.h"
+#include <numeric>
+#include <algorithm>
 using namespace std;
 
-void tryleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void tryleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (--j >= 0)
@@ -18,7 +20,7 @@ void tryleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bo
         else
             flip++;
 }
-void tryright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void tryright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (++j < EdgeSize)
@@ -35,7 +37,7 @@ void tryright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, b
         else
             flip++;
 }
-void tryup(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void tryup(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (--i >= 0)
@@ -52,7 +54,7 @@ void tryup(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool
         else
             flip++;
 }
-void trydown(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void trydown(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (++i < EdgeSize)
@@ -69,7 +71,7 @@ void trydown(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bo
         else
             flip++;
 }
-void upright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void upright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (--i >= 0 && ++j < EdgeSize)
@@ -86,7 +88,7 @@ void upright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bo
         else
             flip++;
 }
-void upleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void upleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (--i >= 0 && --j >= 0)
@@ -103,7 +105,7 @@ void upleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, boo
         else
             flip++;
 }
-void downright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void downright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (++i < EdgeSize && ++j < EdgeSize)
@@ -120,7 +122,7 @@ void downright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, 
         else
             flip++;
 }
-void downleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal)
+void downleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal)
 {
     int flip = 0; //the amount of stones we flip
     while (++i < EdgeSize && --j >= 0)
@@ -138,7 +140,7 @@ void downleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, b
             flip++;
 }
 //Attempts a move on the position i,j. Returns true and changes the board if such move is legal.
-bool tryMove(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j)
+bool tryMove(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j)
 {
     if (board[i * EdgeSize + j] != 0)
         return false;
@@ -164,38 +166,47 @@ bool tryMove(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j)
     return legal;
 }
 //Returns true if we made a move
-bool newMove(array<int8_t, BoardSize> &board, int8_t col, int8_t RdId, int8_t &moveIndex)
+bool newMove(int8_t board[BoardSize], int8_t col, int8_t RdId, int8_t &moveIndex)
 {
-    array<pair<int8_t, int8_t>, BoardSize> &MoveArr = shuffledMoves[RdId];
-    while (!tryMove(board, col, MoveArr[moveIndex].first, MoveArr[moveIndex].second))
+    int8_t *I = &Ishuffled[RdId * BoardSize];
+    int8_t *J = &Jshuffled[RdId * BoardSize];
+    while (!tryMove(board, col, I[moveIndex], J[moveIndex]))
         if (--moveIndex < 0)
             return false;
     moveIndex--;
     return true;
 }
-bool hasMove(array<int8_t, BoardSize> board, int8_t col)
+bool hasMove(int8_t board[BoardSize], int8_t col)
 {
+    int8_t newBoard[BoardSize];
+    copy(board, board + BoardSize, newBoard);
     int8_t moveIndex = BoardSize - 1;
-    return newMove(board, col, 0, moveIndex);
+    return newMove(newBoard, col, 0, moveIndex);
 }
-int score(array<int8_t, BoardSize> &board)
+int score(int8_t board[BoardSize])
 {
-    int ret = 0;
-    for (auto stone : board)
-        ret += stone;
+    int ret = accumulate(&board[0], &board[BoardSize], 0);
     ret = (ret > 0) - (ret < 0);
     return ret;
 }
 //Makes random moves, returns the outcome of the game
-int playout(array<int8_t, BoardSize> board, int8_t col)
+int playout(int8_t board[BoardSize], int8_t col)
 {
+    int8_t newBoard[BoardSize];
+    copy(board, board + BoardSize, newBoard);
+    bool justPassed = false;
+    int8_t moveInd;
     while (1)
     {
-        int8_t moveInd = BoardSize - 1;
-        if (!newMove(board, col, rand() % BoardSize, moveInd))
-            if (!hasMove(board, -col))
+        moveInd = BoardSize - 1;
+        if (!newMove(newBoard, col, rand() % BoardSize, moveInd))
+            if (justPassed)
                 break;
+            else
+                justPassed = true;
+        else
+            justPassed - false;
         col = -col;
     }
-    return score(board);
+    return score(newBoard);
 }

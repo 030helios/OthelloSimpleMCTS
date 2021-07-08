@@ -1,10 +1,10 @@
 #ifndef __node_h__
 #define __node_h__
 #include "config"
-#include <array>
 #include <deque>
 #include <math.h>
 #include <random>
+#include <cstdint>
 #include <semaphore.h>
 using namespace std;
 
@@ -20,11 +20,11 @@ public:
     int8_t gameover = -2;
     int totalScore = 0;
     int totalGames = 0;
-    array<int8_t, BoardSize> board;
+    int8_t board[BoardSize];
     deque<Node> children;
 
     Node();
-    Node(array<int8_t, BoardSize> &bd, int8_t co);
+    Node(int8_t *bd, int8_t co);
 
     void clean();
 

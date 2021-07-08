@@ -1,11 +1,13 @@
 #include "bot.h"
 #include <iostream>
+#include <algorithm>
 
-Bot::~Bot(){
-    for(auto &thd:threadVec)
+Bot::~Bot()
+{
+    for (auto &thd : threadVec)
         thd.join();
 }
-Bot::Bot(int timeLimit, int threadCount, array<int8_t, BoardSize> board, int8_t color)
+Bot::Bot(int timeLimit, int threadCount, int8_t board[BoardSize], int8_t color)
 {
     this->timeLimit = timeLimit;
     this->threadCount = threadCount;
@@ -31,7 +33,7 @@ void Bot::countdown(system_clock::time_point start, milliseconds thinkTime, Node
     }
 }
 //makes a play and returns the board
-array<int8_t, BoardSize> Bot::play(array<int8_t, BoardSize> board)
+int8_t *Bot::play(int8_t board[BoardSize])
 {
     system_clock::time_point start = system_clock::now();
     enemyMove(board);
@@ -70,11 +72,11 @@ void Bot::move()
     root = best;
 }
 //changes root if there's a child with such board
-void Bot::enemyMove(array<int8_t, BoardSize> &target)
+void Bot::enemyMove(int8_t target[BoardSize])
 {
     Node *nextRoot = nullptr;
     for (auto &child : root->children)
-        if (child.board == target)
+        if (equal(child.board, child.board + BoardSize, target))
             nextRoot = &child;
     if (nextRoot)
     {

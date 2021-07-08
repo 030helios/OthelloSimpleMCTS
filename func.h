@@ -1,27 +1,28 @@
 #ifndef __func_h__
 #define __func_h__
 #include "config"
-#include <array>
+#include <cstdint>
 using namespace std;
 
-extern array<array<pair<int8_t, int8_t>, BoardSize>, BoardSize> shuffledMoves;
+extern int8_t Ishuffled[BoardSize * BoardSize];
+extern int8_t Jshuffled[BoardSize * BoardSize];
 
-void tryleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void tryright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void tryup(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void trydown(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void upright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void upleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void downright(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
-void downleft(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j, bool &legal);
+void tryleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void tryright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void tryup(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void trydown(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void upright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void upleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void downright(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
+void downleft(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j, bool &legal);
 
-bool tryMove(array<int8_t, BoardSize> &board, int8_t col, int8_t i, int8_t j);
+bool tryMove(int8_t board[BoardSize], int8_t col, int8_t i, int8_t j);
 
-bool newMove(array<int8_t, BoardSize> &board, int8_t col, int8_t RdId, int8_t &moveIndex);
+bool newMove(int8_t board[BoardSize], int8_t col, int8_t RdId, int8_t &moveIndex);
 
-bool hasMove(array<int8_t, BoardSize> board, int8_t col);
+bool hasMove(int8_t board[BoardSize], int8_t col);
 
-int score(array<int8_t, BoardSize> &board);
+int score(int8_t board[BoardSize]);
 
-int playout(array<int8_t, BoardSize> board, int8_t col);
+int playout(int8_t board[BoardSize], int8_t col);
 #endif
