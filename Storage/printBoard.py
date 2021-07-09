@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 EdgeSize = int(sys.argv[1])
 
 plt.figure(figsize=(5, 5))
-fig = plt.gcf()
 ax = plt.gca()
 
 plt.xlim(0, EdgeSize)

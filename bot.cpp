@@ -31,6 +31,23 @@ void Bot::countdown(system_clock::time_point start, milliseconds thinkTime, Node
         root->explore(round(depth - log(timepast.count() * threadCount) / log(EdgeSize)));
     } while (timepast < thinkTime);
 }
+void Bot::Log(ostream &out)
+{
+    out << "Total playouts: " << root->totalGames << endl;
+    if (root->gameover == -2 || root->gameover == 0)
+    {
+        if (root->gameover == 0)
+            out << "Maybe Draw, ";
+        out << (root->color == 1 ? "Black " : "White ");
+        float winrate = 0.5 + float(root->totalScore * root->color) / (2 * root->totalGames);
+        out << "winrate estimate: " << winrate << endl;
+    }
+    else
+    {
+        out << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
+        timeLimit = milliseconds(1);
+    }
+}
 //makes a play and returns the board
 int8_t *Bot::play(int8_t board[BoardSize])
 {
@@ -42,21 +59,7 @@ int8_t *Bot::play(int8_t board[BoardSize])
         jobs.emplace_back(countdown, start, timeLimit, root, depth, threadCount);
     for (int i = 0; i < threadCount; i++)
         jobs[i].join();
-
-    cout << "Total playouts: " << root->totalGames << endl;
-    if (root->gameover == -2 || root->gameover == 0)
-    {
-        if (root->gameover == 0)
-            cout << "Maybe Draw, ";
-        cout << (root->col == 1 ? "Black " : "White ");
-        float winrate = 0.5 + float(root->totalScore * root->col) / (2 * root->totalGames);
-        cout << "winrate estimate: " << winrate << endl;
-    }
-    else
-    {
-        cout << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
-        timeLimit = milliseconds(1);
-    }
+    Log(cout);
     move();
     return root->board;
 }
@@ -68,7 +71,7 @@ void Bot::move()
         if (child->totalGames > best->totalGames)
             best = child;
     for (auto child : root->children)
-        if (child->gameover == root->col)
+        if (child->gameover == root->color)
             best = child;
     threadVec.emplace_back(trim, root, best);
     root = best;

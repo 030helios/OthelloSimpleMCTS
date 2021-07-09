@@ -11,7 +11,7 @@ Node::Node()
 {
     sem_init(&sem, 0, 1);
 }
-Node::Node(int8_t *bd, int8_t co) : col(co), RdId(rand() % BoardSize)
+Node::Node(int8_t *bd, int8_t col) : color(col), shuffleID(rand() % BoardSize)
 {
     copy(bd, bd + BoardSize, board);
     sem_init(&sem, 0, 1);
@@ -27,15 +27,15 @@ void Node::clean()
 //initializes new child if possible
 Node *Node::getNewChild()
 {
-    Node *child = new Node(board, -col);
-    if (newMove(child->board, col, RdId, moveIndex))
+    Node *child = new Node(board, -color);
+    if (newMove(child->board, color, shuffleID, moveIndex))
         children.emplace_back(child);
     else if (children.size() > 0) // has children
     {
         delete child;
         return nullptr;
     }
-    else if (!hasMove(board, -col)) //won
+    else if (!hasMove(board, -color)) //won
     {
         delete child;
         return nullptr;
@@ -68,7 +68,7 @@ Node *Node::select()
             sem_post(&child->sem);
             return child;
         }
-        float ucb = child->UCB(totalGames, col);
+        float ucb = child->UCB(totalGames, color);
         if (ucb > ucbmax)
         {
             ucbmax = ucb;
@@ -92,7 +92,7 @@ int Node::explore(int8_t heat)
     }
     if (heat == 0)
     {
-        totalScore = playout(board, col);
+        totalScore = playout(board, color);
         sem_post(&sem);
         return totalScore;
     }

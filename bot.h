@@ -28,6 +28,8 @@ class Bot
 public:
     ~Bot();
     Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color);
+    
+    void Log(ostream &out);
     int8_t *play(int8_t board[BoardSize]);
 };
 #endif

@@ -14,8 +14,8 @@ private:
     sem_t sem;
 
 public:
-    int8_t col;
-    int8_t RdId;
+    int8_t color;
+    int8_t shuffleID;
     int8_t moveIndex = BoardSize - 1;
     int8_t gameover = -2;
     int totalScore = 0;
@@ -25,12 +25,12 @@ public:
 
     ~Node();
     Node();
-    Node(int8_t *bd, int8_t co);
+    Node(int8_t *bd, int8_t col);
 
     void clean();
 
     Node *getNewChild();
-    float UCB(int N, int8_t co);
+    float UCB(int N, int8_t col);
     Node *select();
 
     int explore(int8_t heat);
