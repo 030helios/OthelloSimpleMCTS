@@ -2,6 +2,11 @@
 #include "node.h"
 using namespace std;
 
+Node::~Node()
+{
+    for (auto child : children)
+        delete child;
+}
 Node::Node()
 {
     sem_init(&sem, 0, 1);
@@ -16,22 +21,28 @@ void Node::clean()
 {
     totalScore = 0;
     totalGames = 0;
-    for (auto &child : children)
-        child.clean();
+    for (auto child : children)
+        child->clean();
 }
 //initializes new child if possible
 Node *Node::getNewChild()
 {
-    Node child(board, -col);
-    if (newMove(child.board, col, RdId, moveIndex))
-        children.push_back(child);
+    Node *child = new Node(board, -col);
+    if (newMove(child->board, col, RdId, moveIndex))
+        children.emplace_back(child);
     else if (children.size() > 0) // has children
+    {
+        delete child;
         return nullptr;
+    }
     else if (!hasMove(board, -col)) //won
+    {
+        delete child;
         return nullptr;
+    }
     else //pass
-        children.push_back(child);
-    return &children.back();
+        children.emplace_back(child);
+    return children.back();
 }
 float Node::UCB(int N, int8_t parentColor)
 {
@@ -49,22 +60,22 @@ Node *Node::select()
 {
     float ucbmax = -INFINITY;
     Node *best = nullptr;
-    for (auto &child : children)
+    for (auto child : children)
     {
-        sem_wait(&child.sem);
-        if (child.totalGames == 0)
+        sem_wait(&child->sem);
+        if (child->totalGames == 0)
         {
-            sem_post(&child.sem);
-            return &child;
+            sem_post(&child->sem);
+            return child;
         }
-        float ucb = child.UCB(totalGames, col);
+        float ucb = child->UCB(totalGames, col);
         if (ucb > ucbmax)
         {
             ucbmax = ucb;
-            best = &child;
-            gameover = child.gameover;
+            best = child;
+            gameover = child->gameover;
         }
-        sem_post(&child.sem);
+        sem_post(&child->sem);
     }
     return best;
 }

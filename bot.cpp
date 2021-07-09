@@ -7,30 +7,29 @@ Bot::~Bot()
     for (auto &thd : threadVec)
         thd.join();
 }
-Bot::Bot(int timeLimit, int threadCount, int8_t board[BoardSize], int8_t color)
+Bot::Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color) : timeLimit(seconds(tLimit)), threadCount(thrCount)
 {
-    this->timeLimit = timeLimit;
-    this->threadCount = threadCount;
-    depth = log(timeLimit * 1000 * threadCount) / log(EdgeSize) + 0.5;
+    depth = log(timeLimit.count() * thrCount) / log(EdgeSize) + 0.5;
     source = Node(board, color);
     root = &source;
 }
 //removes any child that isn't keep
 void Bot::trim(Node *parent, Node *keep)
 {
-    while (&parent->children.front() != keep)
-        parent->children.pop_front();
-    while (&parent->children.back() != keep)
-        parent->children.pop_back();
+    for (auto child : parent->children)
+        if (child != keep)
+            delete child;
+    parent->children[0] = keep;
+    parent->children.resize(1);
 }
 void Bot::countdown(system_clock::time_point start, milliseconds thinkTime, Node *root, float depth, int threadCount)
 {
-    milliseconds timepast = duration_cast<milliseconds>(system_clock::now() - start);
-    while (timepast < thinkTime)
+    milliseconds timepast;
+    do
     {
-        root->explore(round(depth - log(timepast.count() * threadCount) / log(EdgeSize)));
         timepast = duration_cast<milliseconds>(system_clock::now() - start);
-    }
+        root->explore(round(depth - log(timepast.count() * threadCount) / log(EdgeSize)));
+    } while (timepast < thinkTime);
 }
 //makes a play and returns the board
 int8_t *Bot::play(int8_t board[BoardSize])
@@ -40,7 +39,7 @@ int8_t *Bot::play(int8_t board[BoardSize])
     root->clean();
     vector<thread> jobs;
     for (int i = 0; i < threadCount; i++)
-        jobs.emplace_back(countdown, start, seconds(timeLimit), root, depth, threadCount);
+        jobs.emplace_back(countdown, start, timeLimit, root, depth, threadCount);
     for (int i = 0; i < threadCount; i++)
         jobs[i].join();
 
@@ -54,33 +53,33 @@ int8_t *Bot::play(int8_t board[BoardSize])
         cout << "winrate estimate: " << winrate << endl;
     }
     else
+    {
         cout << "Winner: " << (root->gameover == 1 ? "Black\n" : "White\n");
+        timeLimit = milliseconds(1);
+    }
     move();
     return root->board;
 }
 //updates root to the most visited child node
 void Bot::move()
 {
-    Node *best = &root->children.front();
-    for (auto &child : root->children)
-        if (child.totalGames > best->totalGames)
-            best = &child;
-    for (auto &child : root->children)
-        if (child.gameover == root->col)
-            best = &child;
+    Node *best = root->children.front();
+    for (auto child : root->children)
+        if (child->totalGames > best->totalGames)
+            best = child;
+    for (auto child : root->children)
+        if (child->gameover == root->col)
+            best = child;
     threadVec.emplace_back(trim, root, best);
     root = best;
 }
 //changes root if there's a child with such board
 void Bot::enemyMove(int8_t target[BoardSize])
 {
-    Node *nextRoot = nullptr;
-    for (auto &child : root->children)
-        if (equal(child.board, child.board + BoardSize, target))
-            nextRoot = &child;
-    if (nextRoot)
-    {
-        threadVec.emplace_back(trim, root, nextRoot);
-        root = nextRoot;
-    }
+    for (auto child : root->children)
+        if (equal(child->board, child->board + BoardSize, target))
+        {
+            threadVec.emplace_back(trim, root, child);
+            root = child;
+        }
 }

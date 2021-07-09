@@ -1,7 +1,7 @@
 #ifndef __node_h__
 #define __node_h__
 #include "config"
-#include <deque>
+#include <vector>
 #include <math.h>
 #include <random>
 #include <cstdint>
@@ -21,8 +21,9 @@ public:
     int totalScore = 0;
     int totalGames = 0;
     int8_t board[BoardSize];
-    deque<Node> children;
+    vector<Node *> children;
 
+    ~Node();
     Node();
     Node(int8_t *bd, int8_t co);
 

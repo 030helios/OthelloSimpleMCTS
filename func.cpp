@@ -185,7 +185,7 @@ bool hasMove(int8_t board[BoardSize], int8_t col)
 }
 int score(int8_t board[BoardSize])
 {
-    int ret = accumulate(&board[0], &board[BoardSize], 0);
+    int ret = accumulate(board, board + BoardSize, 0);
     ret = (ret > 0) - (ret < 0);
     return ret;
 }

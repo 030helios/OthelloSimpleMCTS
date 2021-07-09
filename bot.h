@@ -15,7 +15,7 @@ class Bot
     // Default heat value for root exploration.
     // Depends on clock rate, thinkTime and threadCount, which leaves room for improvement.
     float depth;
-    int timeLimit;
+    milliseconds timeLimit;
     int threadCount;
     vector<thread> threadVec;
 
@@ -27,7 +27,7 @@ class Bot
 
 public:
     ~Bot();
-    Bot(int timeLimit, int threadCount, int8_t board[BoardSize], int8_t color);
+    Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color);
     int8_t *play(int8_t board[BoardSize]);
 };
 #endif
