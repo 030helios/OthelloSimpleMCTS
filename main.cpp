@@ -7,10 +7,10 @@
 using namespace std;
 using namespace chrono;
 
-//calls /Storage/eyesore.py
+//calls /Storage/printBoard.py
 void printboard(int8_t board[BoardSize], string name)
 {
-    string str = "./Storage/eyesore.py " + to_string(EdgeSize) + " " + name + ".jpg ";
+    string str = "./Storage/printBoard.py " + to_string(EdgeSize) + " Storage/" + name + ".jpg ";
     for (int i = 0; i < BoardSize; i++)
         str += to_string(board[i]) + ".";
     char exe[str.length()];
