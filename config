@@ -1,2 +1,3 @@
 #define EdgeSize 8
 #define BoardSize (EdgeSize * EdgeSize)
+#define randomness 32

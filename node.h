@@ -24,7 +24,6 @@ public:
     vector<Node *> children;
 
     ~Node();
-    Node();
     Node(int8_t *bd, int8_t col);
 
     void clean();

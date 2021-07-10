@@ -7,10 +7,9 @@ Bot::~Bot()
     for (auto &thd : threadVec)
         thd.join();
 }
-Bot::Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color) : timeLimit(seconds(tLimit)), threadCount(thrCount)
+Bot::Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color) : timeLimit(seconds(tLimit)), threadCount(thrCount), source(board, color)
 {
     depth = log(timeLimit.count() * thrCount) / log(EdgeSize) + 0.5;
-    source = Node(board, color);
     root = &source;
 }
 //removes any child that isn't keep

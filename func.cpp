@@ -199,7 +199,7 @@ int playout(int8_t board[BoardSize], int8_t color)
     while (1)
     {
         moveInd = BoardSize - 1;
-        if (!newMove(newBoard, color, rand() % BoardSize, moveInd))
+        if (!newMove(newBoard, color, rand() % randomness, moveInd))
             if (justPassed)
                 break;
             else

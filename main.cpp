@@ -18,8 +18,8 @@ void printboard(int8_t board[BoardSize], string name)
     system(exe);
 }
 //An array of shuffled arrays filled with indexes
-int8_t Ishuffled[BoardSize * BoardSize];
-int8_t Jshuffled[BoardSize * BoardSize];
+int8_t Ishuffled[randomness * BoardSize];
+int8_t Jshuffled[randomness * BoardSize];
 
 int main()
 {
@@ -36,7 +36,7 @@ int main()
         for (int j = 0; j < EdgeSize; j++)
             moves[i * EdgeSize + j] = make_pair(i, j);
 
-    for (int ind = 0; ind < BoardSize; ind++)
+    for (int ind = 0; ind < randomness; ind++)
     {
         random_shuffle(moves.begin(), moves.end());
         for (int i = 0; i < BoardSize; i++)

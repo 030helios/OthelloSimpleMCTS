@@ -4,8 +4,8 @@
 #include <cstdint>
 using namespace std;
 
-extern int8_t Ishuffled[BoardSize * BoardSize];
-extern int8_t Jshuffled[BoardSize * BoardSize];
+extern int8_t Ishuffled[randomness * BoardSize];
+extern int8_t Jshuffled[randomness * BoardSize];
 
 void tryleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal);
 void tryright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal);

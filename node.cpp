@@ -7,11 +7,7 @@ Node::~Node()
     for (auto child : children)
         delete child;
 }
-Node::Node()
-{
-    sem_init(&sem, 0, 1);
-}
-Node::Node(int8_t *bd, int8_t col) : color(col), shuffleID(rand() % BoardSize)
+Node::Node(int8_t *bd, int8_t col) : color(col), shuffleID(rand() % randomness)
 {
     copy(bd, bd + BoardSize, board);
     sem_init(&sem, 0, 1);
