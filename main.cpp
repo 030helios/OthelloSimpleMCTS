@@ -68,6 +68,6 @@ int main()
     }
     for (auto &thr : threadVec)
         thr.join();
-    cout << "Winner: " << (score(board) == 1 ? "Black" : "White") << endl;
+    cout << "Winner: " << (score(board) == 1 ? "Black." : "White.") << endl;
     return 0;
 }
