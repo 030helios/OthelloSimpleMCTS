@@ -12,7 +12,7 @@ Bot::Bot(int tLimit, int thrCount, int8_t board[BoardSize], int8_t color) : time
     depth = log(timeLimit.count() * thrCount) / log(EdgeSize) + 0.5;
     root = &source;
 }
-//removes any child that isn't keep
+// removes any child that isn't keep
 void Bot::trim(Node *parent, Node *keep)
 {
     for (auto child : parent->children)
@@ -47,7 +47,7 @@ void Bot::Log(ostream &out)
         timeLimit = milliseconds(1);
     }
 }
-//makes a play and returns the board
+// makes a play and returns the board
 int8_t *Bot::play(int8_t board[BoardSize])
 {
     system_clock::time_point start = system_clock::now();
@@ -62,7 +62,7 @@ int8_t *Bot::play(int8_t board[BoardSize])
     move();
     return root->board;
 }
-//updates root to the most visited child node
+// updates root to the most visited child node
 void Bot::move()
 {
     Node *best = root->children.front();
@@ -75,7 +75,7 @@ void Bot::move()
     threadVec.emplace_back(trim, root, best);
     root = best;
 }
-//changes root if there's a child with such board
+// changes root if there's a child with such board
 void Bot::enemyMove(int8_t target[BoardSize])
 {
     for (auto child : root->children)

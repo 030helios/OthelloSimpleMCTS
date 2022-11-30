@@ -7,17 +7,15 @@
 using namespace std;
 using namespace chrono;
 
-//calls /Storage/printBoard.py
+// calls /Storage/printBoard.py
 void printboard(int8_t board[BoardSize], string name)
 {
     string str = "./Storage/printBoard.py " + to_string(EdgeSize) + " Storage/" + name + ".jpg ";
     for (int i = 0; i < BoardSize; i++)
         str += to_string(board[i]) + ".";
-    char exe[str.length()];
-    strcpy(exe, str.c_str());
-    system(exe);
+    system(str.c_str());
 }
-//An array of shuffled arrays filled with indexes
+// An array of shuffled arrays filled with indexes
 int8_t Ishuffled[randomness * BoardSize];
 int8_t Jshuffled[randomness * BoardSize];
 
@@ -53,7 +51,7 @@ int main()
     board[d - 1] = -1;
     board[d - EdgeSize] = -1;
     board[d - EdgeSize - 1] = 1;
-    //default black
+    // default black
     Bot bot(timeLimit, threadCount, board, 1);
 
     int index = 0;

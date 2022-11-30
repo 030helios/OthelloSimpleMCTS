@@ -5,7 +5,7 @@ using namespace std;
 
 void tryleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (--j >= 0)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -22,7 +22,7 @@ void tryleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &le
 }
 void tryright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (++j < EdgeSize)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -39,7 +39,7 @@ void tryright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &l
 }
 void tryup(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (--i >= 0)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -56,7 +56,7 @@ void tryup(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &lega
 }
 void trydown(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (++i < EdgeSize)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -73,7 +73,7 @@ void trydown(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &le
 }
 void upright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (--i >= 0 && ++j < EdgeSize)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -90,7 +90,7 @@ void upright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &le
 }
 void upleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (--i >= 0 && --j >= 0)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -107,7 +107,7 @@ void upleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &leg
 }
 void downright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (++i < EdgeSize && ++j < EdgeSize)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -124,7 +124,7 @@ void downright(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &
 }
 void downleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &legal)
 {
-    int flip = 0; //the amount of stones we flip
+    int flip = 0; // the amount of stones we flip
     while (++i < EdgeSize && --j >= 0)
         if (board[i * EdgeSize + j] == 0)
             return;
@@ -139,7 +139,7 @@ void downleft(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j, bool &l
         else
             flip++;
 }
-//Attempts a move on the position i,j. Returns true and changes the board if such move is legal.
+// Attempts a move on the position i,j. Returns true and changes the board if such move is legal.
 bool tryMove(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j)
 {
     if (board[i * EdgeSize + j] != 0)
@@ -165,7 +165,7 @@ bool tryMove(int8_t board[BoardSize], int8_t color, int8_t i, int8_t j)
         board[i * EdgeSize + j] = color;
     return legal;
 }
-//Returns true if we made a move
+// Returns true if we made a move
 bool newMove(int8_t board[BoardSize], int8_t color, int8_t shuffleID, int8_t &moveIndex)
 {
     int8_t *I = &Ishuffled[shuffleID * BoardSize];
@@ -186,10 +186,9 @@ bool hasMove(int8_t board[BoardSize], int8_t color)
 int score(int8_t board[BoardSize])
 {
     int ret = accumulate(board, board + BoardSize, 0);
-    ret = (ret > 0) - (ret < 0);
-    return ret;
+    return (ret > 0) - (ret < 0);
 }
-//Makes random moves, returns the outcome of the game
+// Makes random moves, returns the outcome of the game
 int playout(int8_t board[BoardSize], int8_t color)
 {
     int8_t newBoard[BoardSize];

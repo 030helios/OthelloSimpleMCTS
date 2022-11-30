@@ -12,7 +12,7 @@ Node::Node(int8_t *bd, int8_t col) : color(col), shuffleID(rand() % randomness)
     copy(bd, bd + BoardSize, board);
     sem_init(&sem, 0, 1);
 }
-//removes data without removing the structure
+// removes data without removing the structure
 void Node::clean()
 {
     totalScore = 0;
@@ -20,7 +20,7 @@ void Node::clean()
     for (auto child : children)
         child->clean();
 }
-//initializes new child if possible
+// initializes new child if possible
 Node *Node::getNewChild()
 {
     Node *child = new Node(board, -color);
@@ -31,12 +31,12 @@ Node *Node::getNewChild()
         delete child;
         return nullptr;
     }
-    else if (!hasMove(board, -color)) //won
+    else if (!hasMove(board, -color)) // won
     {
         delete child;
         return nullptr;
     }
-    else //pass
+    else // pass
         children.emplace_back(child);
     return children.back();
 }
@@ -51,7 +51,7 @@ float Node::UCB(int N, int8_t parentColor)
     a += 0.5 + (float)(totalScore) / (parentColor * 2 * totalGames);
     return a;
 }
-//returns child with greatest UCB
+// returns child with greatest UCB
 Node *Node::select()
 {
     float ucbmax = -INFINITY;
@@ -75,7 +75,7 @@ Node *Node::select()
     }
     return best;
 }
-//Heat determines whether to allocate new child or not
+// Heat determines whether to allocate new child or not
 int Node::explore(int8_t heat)
 {
     Node *child = nullptr;
@@ -98,7 +98,7 @@ int Node::explore(int8_t heat)
         child = select();
     else
         heat--;
-    if (child == nullptr) //won
+    if (child == nullptr) // won
     {
         gameover = score(board);
         sem_post(&sem);
